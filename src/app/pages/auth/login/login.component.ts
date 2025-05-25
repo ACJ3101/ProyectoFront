@@ -1,62 +1,49 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
-import { AuthService } from '../../../core/services/authService/auth.service';
-import { UserService } from '../../../core/services/userService/user.service';
 import { Router } from '@angular/router';
+
+import { HttpService } from '../../../core/services/http/http.service';
+import { StorageService } from '../../../core/services/storageService/storage.service';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule,FormsModule,ReactiveFormsModule, ],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule],
   templateUrl: './login.component.html',
   styleUrl: './login.component.css'
 })
-export class LoginComponent {
+export class LoginComponent implements OnInit {
+
   loginForm: FormGroup;
-  rememberMe: boolean = true;
-  isVisible: boolean = true;
-  errorMessage: boolean = false;
-  isLoading: boolean = false;
-  formSubmitted: boolean = false;
-  showModal: boolean = false; // Controla la visibilidad del modal
-  idiomaActual:string = 'es';
+  formSubmitted = false;
+  errorMessage = false;
+  isVisible = true;
+  isLoading = false;
 
   constructor(
-    private formBuilder: FormBuilder,
-    private authService: AuthService,
-    private router: Router,
-    private userService: UserService,
+    private fb: FormBuilder,
+    private httpService: HttpService,
+    private storageService: StorageService,
+    public router: Router
   ) {
-    this.loginForm = this.formBuilder.group({
+    this.loginForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
       password: ['', Validators.required],
       rememberMe: [true]
     });
-
-
   }
 
-  ngOnInit() {
-    // Verificar si debe mostrarse el modal de cierre de sesión
-    // this.logOutModalService.getModal().subscribe(show => {
-    //   this.showModal = show;
-    // });
-
-    const EMAIL = localStorage.getItem('email');
-    if (EMAIL) {
-      this.loginForm.patchValue({ email: EMAIL, rememberMe: true });
+  ngOnInit(): void {
+    if (typeof window !== 'undefined') {
+      const EMAIL = localStorage.getItem('email');
+      if (EMAIL) {
+        this.loginForm.patchValue({ email: EMAIL, rememberMe: true });
+      }
     }
-
-
   }
 
-  // closeModal() {
-  //   this.showModal = false;
-  //   this.logOutModalService.setModal(false);
-  // }
-
-  changeVisible() {
+  changeVisible(): void {
     this.isVisible = !this.isVisible;
   }
 
@@ -68,26 +55,47 @@ export class LoginComponent {
       return;
     }
 
-    // this.isLoading = true;
-    // let { email, password, rememberMe } = this.loginForm.value;
+    const { email, password, rememberMe } = this.loginForm.value;
+    this.isLoading = true;
+    this.errorMessage = false;
 
-    // this.authService.login(email, password, rememberMe).subscribe({
-    //   next: () => {
-    //     this.userService.setUserName().subscribe({
-    //       next: () => {
-    //         this.router.navigate(['/home']);
-    //       },
-    //       error: (err) => console.error(err)
-    //     });
-    //   },
-    //   error: () => {
-    //     this.errorMessage = true;
-    //     this.isLoading = false;
-    //     setTimeout(() => {
-    //       this.errorMessage = false;
-    //     }, 4000);
-    //   }
-    // });
+    this.httpService.login(email, password).subscribe({
+      next: (res) => {
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('token', res.accessToken);
+          localStorage.setItem('refreshToken', res.refreshToken);
+
+          if (rememberMe) {
+            localStorage.setItem("rememberMe", "true")
+          }else{
+            localStorage.setItem("rememberMe", "")
+
+          }
+
+          if (rememberMe) {
+            localStorage.setItem('email', email);
+          } else {
+            localStorage.removeItem('email');
+          }
+        }
+
+        this.httpService.getUsuarioActual().subscribe({
+          next: (usuario) => {
+            this.storageService.guardarUsuario(usuario);
+            this.router.navigate(['/home']);
+          },
+          error: () => {
+            alert('Error al obtener los datos del usuario');
+          }
+        });
+      },
+      error: () => {
+        this.errorMessage = true;
+        this.isLoading = false;
+      },
+      complete: () => {
+        this.isLoading = false;
+      }
+    });
   }
 }
-

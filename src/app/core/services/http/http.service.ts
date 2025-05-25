@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Usuario } from '../../models/interfaces';
+import { log } from 'console';
 
 @Injectable({
   providedIn: 'root'
@@ -10,18 +11,18 @@ export class HttpService {
 
   private baseUrl = 'http://localhost:8080/api'; // Cambia si usas otro puerto
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   // ----------------------------
   // 🔐 AUTENTICACIÓN
   // ----------------------------
 
   login(email: string, password: string): Observable<any> {
-    return this.http.post(`${this.baseUrl}/auth/getAccessToken`, { email, password });
+    return this.http.post(`${this.baseUrl}/auth/login`, { email, password });
   }
 
   refreshToken(refreshToken: string): Observable<any> {
-    return this.http.post(`${this.baseUrl}/auth/refreshAccessToken`, { refreshToken });
+    return this.http.post(`${this.baseUrl}/auth/refresh`, { refreshToken });
   }
 
   // ----------------------------
@@ -34,10 +35,36 @@ export class HttpService {
     });
   }
 
-  crearUsuario(usuario: Usuario): Observable<Usuario> {
-  return this.http.post<Usuario>('http://localhost:8080/api/usuarios/crearUsuario', usuario)
+  getUsuarioPorEmail(email: string): Observable<Usuario> {
+    const token = localStorage.getItem('token') || '';
+    const headers = this.authHeaders(token);
 
-}
+    // Codificar el email explícitamente
+    const emailCodificado = encodeURIComponent(email);
+
+    return this.http.get<Usuario>(
+      `${this.baseUrl}/usuarios/buscarPorEmail?email=${emailCodificado}`,
+      { headers }
+    );
+  }
+
+  getUsuarioActual(): Observable<Usuario> {
+    return this.http.get<Usuario>(`${this.baseUrl}/usuarios/me`, {
+      headers: this.authHeaders(this.getToken())
+    });
+  }
+
+  private getToken(): string {
+    return localStorage.getItem('token') || '';
+  }
+
+
+
+
+  crearUsuario(usuario: Usuario): Observable<Usuario> {
+    return this.http.post<Usuario>('http://localhost:8080/api/usuarios/crearUsuario', usuario)
+
+  }
 
 
   // ----------------------------

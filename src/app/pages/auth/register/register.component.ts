@@ -1,8 +1,11 @@
+import { StorageService } from './../../../core/services/storageService/storage.service';
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { HttpService } from '../../../core/services/http/http.service';
 import { CommonModule } from '@angular/common';
 import { Usuario } from '../../../core/models/interfaces';
+import { Router } from '@angular/router';
+
 
 @Component({
   selector: 'app-register',
@@ -16,7 +19,12 @@ export class RegisterComponent implements OnInit {
   registroForm!: FormGroup;
   submitted = false;
 
-  constructor(private fb: FormBuilder, private httpService: HttpService) {}
+  constructor(
+    private fb: FormBuilder,
+    private httpService: HttpService,
+    private storageService: StorageService,
+    private router: Router
+  ) { }
 
   ngOnInit(): void {
     this.registroForm = this.fb.group({
@@ -51,7 +59,7 @@ export class RegisterComponent implements OnInit {
     if (this.registroForm.valid) {
       const formValue = this.registroForm.value;
 
-      const nuevoUsuario: Usuario= {
+      const nuevoUsuario = {
         email: formValue.email,
         nombre: formValue.nombre,
         apellidos: formValue.apellidos,
@@ -65,8 +73,25 @@ export class RegisterComponent implements OnInit {
       };
 
       this.httpService.crearUsuario(nuevoUsuario).subscribe({
-        next: () => alert('Usuario registrado con éxito'),
-        error: (err) => alert('Error al registrar usuario')
+        next: () => {
+          // 1. Hacer login automático
+          this.httpService.login(nuevoUsuario.email, nuevoUsuario.contraseña).subscribe({
+            next: (response) => {
+              const accessToken = response.accessToken;
+              this.storageService.guardarUsuario(nuevoUsuario);
+              localStorage.setItem('token', accessToken); // opcional: guardar token
+
+              // 2. Limpiar formulario
+              this.registroForm.reset();
+              this.submitted = false;
+
+              // 3. Redirigir a /home
+              this.router.navigate(['/home']);
+            },
+            error: () => alert('Error al iniciar sesión automáticamente')
+          });
+        },
+        error: () => alert('Error al registrar usuario')
       });
     }
   }

@@ -1,87 +1,63 @@
-<!-- Section: Design Block -->
-<section class="">
-  <!-- Jumbotron -->
-  <div
-    class="px-4 py-5 px-md-5 text-center text-lg-start"
-    style="background-color: hsl(0, 0%, 96%)"
-  >
-    <div class="container">
-      <div class="row gx-lg-5 align-items-center">
-        <div class="col-lg-6 mb-5 mb-lg-0">
-          <h1 class="my-5 display-3 fw-bold ls-tight">
-            The best offer <br />
-            <span class="text-primary">for your business</span>
-          </h1>
-          <p style="color: hsl(217, 10%, 50.8%)">
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. Eveniet,
-            itaque accusantium odio, soluta, corrupti aliquam quibusdam tempora
-            at cupiditate quis eum maiores libero veritatis? Dicta facilis sint
-            aliquid ipsum atque?
-          </p>
-        </div>
+<div class="px-4 py-5 px-md-5 text-center text-lg-start" style="background-color: hsl(0, 0%, 96%)">
+  <div class="container">
+    <div class="row gx-lg-5 align-items-center">
+      <div class="col-lg-6 mb-5 mb-lg-0">
+        <h1 class="my-5 display-3 fw-bold ls-tight">
+          Bienvenido<br />
+          <span class="text-primary">a la tienda de crochet</span>
+        </h1>
+        <p style="color: hsl(217, 10%, 50.8%)">
+          Inicia sesión para acceder a tus pedidos, productos y mucho más. Comparte tus ideas y disfruta de la comunidad.
+        </p>
+      </div>
 
-        <div class="col-lg-6 mb-5 mb-lg-0">
-          <div class="card">
-            <div class="card-body py-5 px-md-5">
-              <form>
-                <!-- Email input -->
-                <div data-mdb-input-init class="form-outline mb-4">
-                  <label class="form-label" for="form3Example3"
-                    >Email</label
-                  >
-                  <input type="email" id="form3Example3" class="form-control" />
+      <div class="col-lg-6 mb-5 mb-lg-0">
+        <div class="card shadow">
+          <div class="card-body py-5 px-md-5">
+            <form [formGroup]="loginForm" (ngSubmit)="login()">
+              <!-- Email -->
+              <div class="form-outline mb-4">
+                <label class="form-label">Email</label>
+                <input type="email" class="form-control" formControlName="email" />
+                <div *ngIf="formSubmitted && loginForm.controls['email'].invalid" class="text-danger">
+                  Email válido es requerido
                 </div>
+              </div>
 
-                <!-- Password input -->
-                <div data-mdb-input-init class="form-outline mb-4">
-                  <label class="form-label" for="form3Example4">Contraseña</label>
-                  <input
-                    type="password"
-                    id="form3Example4"
-                    class="form-control"
-                  />
+              <!-- Contraseña -->
+              <div class="form-outline mb-4">
+                <label class="form-label">Contraseña</label>
+                <input [type]="isVisible ? 'password' : 'text'" class="form-control" formControlName="password" />
+                <div *ngIf="formSubmitted && loginForm.controls['password'].invalid" class="text-danger">
+                  La contraseña es obligatoria
                 </div>
+                <a href="#" class="small" (click)="changeVisible()">Mostrar/Ocultar</a>
+              </div>
 
-                <!-- Checkbox -->
-                <div class="form-check d-flex justify-content-start mb-4">
-                  <input
-                    class="form-check-input me-2"
-                    type="checkbox"
-                    value=""
-                    id="form2Example33"
-                    checked
-                  />
-                  <label class="form-check-label" for="form2Example33">
-                    Recuerdame
-                  </label>
-                </div>
+              <!-- Recuerdame -->
+              <div class="form-check d-flex justify-content-start mb-4">
+                <input class="form-check-input me-2" type="checkbox" id="recordar" formControlName="rememberMe" />
+                <label class="form-check-label" for="recordar">Recuérdame</label>
+              </div>
 
-                <div class="justify-content-center">
-                  <!-- Submit button -->
-                  <button
-                    type="submit"
-                    data-mdb-button-init
-                    data-mdb-ripple-init
-                    class="btn btn-primary btn-block me-2"
-                  >
-                    Iniciar sesion
-                  </button>
-                  <button
-                    type="submit"
-                    data-mdb-button-init
-                    data-mdb-ripple-init
-                    class="btn btn-primary btn-block "
-                  >
-                    Registrarse
-                  </button>
-                </div>
-              </form>
-            </div>
+              <!-- Botones -->
+              <div class="d-flex justify-content-between align-items-center">
+                <button type="submit" class="btn btn-primary btn-block me-2" [disabled]="isLoading">
+                  {{ isLoading ? 'Entrando...' : 'Iniciar sesión' }}
+                </button>
+                <button type="button" class="btn btn-outline-primary" (click)="router.navigate(['/auth/register'])">
+                  Registrarse
+                </button>
+              </div>
+
+              <!-- Error -->
+              <div *ngIf="errorMessage" class="text-danger mt-3">
+                Credenciales inválidas. Intenta de nuevo.
+              </div>
+            </form>
           </div>
         </div>
       </div>
     </div>
   </div>
-  <!-- Jumbotron -->
-</section>
-<!-- Section: Design Block -->
+</div>

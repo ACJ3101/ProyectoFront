@@ -28,6 +28,10 @@ export const PAGES_ROUTES: Routes = [
         loadComponent: () => import('./shop/shop.component').then(m => m.ShopComponent)
       },
       {
+        path: 'cart',
+        loadComponent: () => import('./cart/cart.component').then(m => m.CartComponent)
+      },
+      {
         path: '**',
         redirectTo: 'home',
       },

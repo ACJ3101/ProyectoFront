@@ -1,1 +1,20 @@
-<p>blog works!</p>
+<div class="container mt-4">
+  <h2 class="text-center mb-4">Foro de la Comunidad</h2>
+
+  <p class="text-center text-muted mb-5">
+    Comparte tus experiencias, consejos o dudas con otros amantes del crochet.
+  </p>
+
+  <div class="list-group">
+    <div
+      class="list-group-item list-group-item-action flex-column align-items-start"
+      *ngFor="let post of publicaciones">
+      <div class="d-flex w-100 justify-content-between">
+        <h5 class="mb-1">{{ post.titulo }}</h5>
+        <small>{{ post.fechaPublicacion | date:'shortDate' }}</small>
+      </div>
+      <p class="mb-1">{{ post.contenido | slice:0:100 }}...</p>
+      <small class="text-muted">Publicado por {{ post.autor.nombre }} {{ post.autor.apellidos }}</small>
+    </div>
+  </div>
+</div>
