@@ -1,25 +1,21 @@
-import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { Producto } from '../../core/models/interfaces';
-import { CartService } from '../../core/services/cartService/cart.service';
-
+import { HttpService } from '../../core/services/http/http.service';
+import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
 @Component({
   selector: 'app-shop',
-  standalone: true,
-  imports: [CommonModule],
   templateUrl: './shop.component.html',
-  styleUrl: './shop.component.css'
+  styleUrls: ['./shop.component.css'],
+  imports: [CommonModule, RouterModule],
+  standalone: true
 })
 export class ShopComponent implements OnInit {
 
-  productos:Producto[] = []
 
+  constructor() { }
 
-  constructor(private cartService:CartService) {}
+  ngOnInit(): void {
+  }
 
-  ngOnInit(): void {}
-
-  agregarAlCarrito(producto: Producto): void {
-  this.cartService.agregarProducto(producto);
-}
 }

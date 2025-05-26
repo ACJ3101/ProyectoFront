@@ -36,7 +36,7 @@ export class LoginComponent implements OnInit {
 
   ngOnInit(): void {
     if (typeof window !== 'undefined') {
-      const EMAIL = localStorage.getItem('email');
+      const EMAIL = localStorage.getItem('lastEmail');
       if (EMAIL) {
         this.loginForm.patchValue({ email: EMAIL, rememberMe: true });
       }
@@ -81,7 +81,7 @@ export class LoginComponent implements OnInit {
 
         this.httpService.getUsuarioActual().subscribe({
           next: (usuario) => {
-            this.storageService.guardarUsuario(usuario);
+            this.storageService.guardarUsuario(usuario, res.accessToken);
             this.router.navigate(['/home']);
           },
           error: () => {

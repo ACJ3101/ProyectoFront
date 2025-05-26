@@ -3,6 +3,7 @@ import { Component } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { StorageService } from '../../core/services/storageService/storage.service';
 import { CartService } from '../../core/services/cartService/cart.service';
+import { log } from 'console';
 
 @Component({
   selector: 'app-navbar',
@@ -28,6 +29,7 @@ export class NavbarComponent {
     this.storageService.usuario$.subscribe(usuario => {
       this.usuarioNombre = usuario?.nick || null;
       this.usuarioRol = usuario?.rol?.nombre || 'Invitado';
+      console.log(this.usuarioRol);
     });
 
     this.cartService.carrito$.subscribe(carrito => {

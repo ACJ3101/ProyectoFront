@@ -1,4 +1,8 @@
-
+export interface Categoria {
+  id: number;
+  nombre: string;
+  descripcion?: string;
+}
 
 export interface Usuario {
   id?: number;
@@ -7,16 +11,14 @@ export interface Usuario {
   nick: string;
   email: string;
   contraseña?: string;
-  direccion: string;
-  fechaRegistr?: string;
-  rol: Rol;
+  direccion?: string;
+  rol?: any;
 }
 
 export interface Rol {
   id: number;
   nombre?: string;
 }
-
 
 export interface Producto {
   id?: number;
@@ -25,7 +27,7 @@ export interface Producto {
   precio: number;
   stock: number;
   imagenUrl?: string;
-  categoria: string;
+  categoriaId : number;
   usuario?: Usuario;
 }
 

@@ -25,7 +25,8 @@ export const PAGES_ROUTES: Routes = [
       },
       {
         path: 'shop',
-        loadComponent: () => import('./shop/shop.component').then(m => m.ShopComponent)
+        loadComponent: () => import('./shop/shop.component').then(m => m.ShopComponent),
+        loadChildren: () => import('./shop/shop.routes').then(m => m.SHOP_ROUTES)
       },
       {
         path: 'cart',

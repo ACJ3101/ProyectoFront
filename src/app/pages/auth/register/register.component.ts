@@ -78,7 +78,7 @@ export class RegisterComponent implements OnInit {
           this.httpService.login(nuevoUsuario.email, nuevoUsuario.contraseña).subscribe({
             next: (response) => {
               const accessToken = response.accessToken;
-              this.storageService.guardarUsuario(nuevoUsuario);
+              this.storageService.guardarUsuario(nuevoUsuario, accessToken);
               localStorage.setItem('token', accessToken); // opcional: guardar token
 
               // 2. Limpiar formulario

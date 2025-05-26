@@ -1,0 +1,48 @@
+.card {
+  transition: transform 0.2s ease-in-out;
+  border: none;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+}
+
+.product-image-link {
+  overflow: hidden;
+  display: block;
+}
+
+.card-img-top {
+  height: 200px;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.card:hover .card-img-top {
+  transform: scale(1.05);
+}
+
+.card-title {
+  font-size: 1.1rem;
+  margin-bottom: 0.5rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.card-text {
+  font-size: 0.9rem;
+}
+
+.card-footer {
+  border-top: 1px solid rgba(0,0,0,0.05);
+}
+
+.btn-outline-primary {
+  width: 100%;
+  transition: all 0.3s ease;
+}
+
+.btn-outline-primary:hover {
+  transform: scale(1.05);
+}

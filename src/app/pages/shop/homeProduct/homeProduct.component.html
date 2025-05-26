@@ -1,0 +1,29 @@
+<!-- Contenedor principal -->
+<div class="container mt-4">
+  <!-- Título de la sección -->
+  <h2 class="text-center mb-4">Nuestros Productos</h2>
+
+  <!-- Grid de productos -->
+  <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
+    <div class="col" *ngFor="let producto of productos">
+      <div class="card h-100 shadow-sm">
+        <!-- Imagen clicable -->
+        <a [routerLink]="['/shop/producto', producto.id]" class="product-image-link">
+          <img [src]="producto.imagenUrl" class="card-img-top" alt="{{ producto.nombre }}" />
+        </a>
+
+        <div class="card-body">
+          <h5 class="card-title">{{ producto.nombre }}</h5>
+          <p class="card-text text-muted">{{ producto.descripcion | slice:0:60 }}...</p>
+          <p class="fw-bold text-primary">{{ producto.precio | currency:'EUR' }}</p>
+        </div>
+
+        <div class="card-footer text-center bg-white">
+          <a class="btn btn-outline-primary btn-sm" [routerLink]="['/shop/producto', producto.id]">
+            Ver detalles
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

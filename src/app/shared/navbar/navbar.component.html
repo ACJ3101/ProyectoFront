@@ -21,7 +21,12 @@
             <a class="nav-link" routerLink="/home">Home</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" routerLink="/shop">Tienda</a>
+            <a class="nav-link" routerLink="/shop/home">Tienda</a>
+          </li>
+          <li class="nav-item" *ngIf="estaLogueado() && (usuarioRol === 'CREADOR' || usuarioRol === 'ADMIN')">
+            <a class="nav-link" routerLink="/shop/mis-productos">
+              <i class="bi bi-box-seam me-1"></i>Mis Productos
+            </a>
           </li>
           <li class="nav-item">
             <a class="nav-link" routerLink="/contact">Contacto</a>
@@ -56,7 +61,7 @@
         </ng-container>
 
         <ng-template #logueado>
-          <a class="nav-link" href="#" (click)="logout()">Cerrar sesión</a>
+          <a class="nav-link" href="#" routerLink="/auth/login" (click)="logout()">Cerrar sesión</a>
         </ng-template>
 
         <!-- 🏷️ Mostrar el rol -->
