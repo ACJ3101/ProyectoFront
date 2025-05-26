@@ -188,11 +188,16 @@ export class AdminComponent implements OnInit {
     if (this.productoForm.valid && this.editandoProducto) {
       this.guardandoProducto = true;
       const datosActualizados = {
-        ...this.productoForm.value,
-        id: this.editandoProducto.id
+        nombre: this.productoForm.value.nombre,
+        descripcion: this.productoForm.value.descripcion,
+        precio: Number(this.productoForm.value.precio),
+        stock: Number(this.productoForm.value.stock),
+        imagenUrl: this.productoForm.value.imagenUrl,
+        publicado: this.productoForm.value.publicado,
+        categoriaId: Number(this.productoForm.value.categoriaId)
       };
 
-      this.httpService.actualizarProducto(datosActualizados, this.editandoProducto.id!).subscribe({
+      this.httpService.actualizarProducto(this.editandoProducto.id!, datosActualizados).subscribe({
         next: () => {
           this.guardandoProducto = false;
           this.toastService.show('Producto actualizado correctamente', 'success');

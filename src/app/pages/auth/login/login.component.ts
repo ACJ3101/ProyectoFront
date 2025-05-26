@@ -19,7 +19,7 @@ export class LoginComponent implements OnInit {
   loginForm: FormGroup;
   formSubmitted = false;
   errorMessage = false;
-  isVisible = true;
+  isVisible = false;
   isLoading = false;
 
   constructor(

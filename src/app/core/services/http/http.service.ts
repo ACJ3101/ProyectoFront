@@ -86,8 +86,16 @@ export class HttpService {
     return this.http.post(`${this.baseUrl}/productos`, data);
   }
 
-  actualizarProducto(id: number, data: any): Observable<any> {
-    return this.http.put(`${this.baseUrl}/productos/${id}`, data);
+  actualizarProducto(id: number, producto: {
+    nombre: string;
+    descripcion: string;
+    precio: number;
+    stock: number;
+    imagenUrl: string;
+    publicado: boolean;
+    categoriaId: number;
+  }): Observable<Producto> {
+    return this.http.put<Producto>(`${this.baseUrl}/productos/${id}`, producto);
   }
 
   eliminarProducto(id: number): Observable<any> {

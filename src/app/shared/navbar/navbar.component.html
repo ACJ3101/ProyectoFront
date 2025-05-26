@@ -32,7 +32,7 @@
           <li class="nav-item">
             <a class="nav-link" routerLink="/blog">Blog</a>
           </li>
-          <li class="nav-item" *ngIf="estaLogueado() && (usuarioRol === 'CREADOR' || usuarioRol === 'ADMIN')">
+          <li class="nav-item" *ngIf="estaLogueado() && (usuarioRol === 'VENDEDOR')">
             <a class="nav-link d-flex align-items-center" routerLink="/shop/mis-productos">
               <i class="bi bi-box-seam me-1"></i>
               <span class="nowrap">Mis Productos</span>
