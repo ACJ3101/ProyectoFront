@@ -5,6 +5,7 @@ import { Router } from '@angular/router';
 
 import { HttpService } from '../../../core/services/http/http.service';
 import { StorageService } from '../../../core/services/storageService/storage.service';
+import { AuthResponse } from '../../../core/models/access-token';
 
 @Component({
   selector: 'app-login',
@@ -60,28 +61,23 @@ export class LoginComponent implements OnInit {
     this.errorMessage = false;
 
     this.httpService.login(email, password).subscribe({
-      next: (res) => {
+      next: (authResponse: AuthResponse) => {
         if (typeof window !== 'undefined') {
-          localStorage.setItem('token', res.accessToken);
-          localStorage.setItem('refreshToken', res.refreshToken);
-
           if (rememberMe) {
-            localStorage.setItem("rememberMe", "true")
-          }else{
-            localStorage.setItem("rememberMe", "")
-
-          }
-
-          if (rememberMe) {
+            localStorage.setItem("rememberMe", "true");
             localStorage.setItem('email', email);
           } else {
+            localStorage.setItem("rememberMe", "");
             localStorage.removeItem('email');
           }
         }
 
+        this.storageService.guardarToken(authResponse.accessToken);
+        this.storageService.guardarRefreshToken(authResponse.refreshToken);
+
         this.httpService.getUsuarioActual().subscribe({
           next: (usuario) => {
-            this.storageService.guardarUsuario(usuario, res.accessToken);
+            this.storageService.guardarUsuario(usuario);
             this.router.navigate(['/home']);
           },
           error: () => {

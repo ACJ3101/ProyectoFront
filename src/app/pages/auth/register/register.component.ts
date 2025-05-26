@@ -4,8 +4,8 @@ import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } 
 import { HttpService } from '../../../core/services/http/http.service';
 import { CommonModule } from '@angular/common';
 import { Usuario } from '../../../core/models/interfaces';
+import { AuthResponse } from '../../../core/models/access-token';
 import { Router } from '@angular/router';
-
 
 @Component({
   selector: 'app-register',
@@ -76,17 +76,27 @@ export class RegisterComponent implements OnInit {
         next: () => {
           // 1. Hacer login automático
           this.httpService.login(nuevoUsuario.email, nuevoUsuario.contraseña).subscribe({
-            next: (response) => {
-              const accessToken = response.accessToken;
-              this.storageService.guardarUsuario(nuevoUsuario, accessToken);
-              localStorage.setItem('token', accessToken); // opcional: guardar token
+            next: (authResponse: AuthResponse) => {
+              // Primero guardamos los tokens
+              this.storageService.guardarToken(authResponse.accessToken);
+              this.storageService.guardarRefreshToken(authResponse.refreshToken);
 
-              // 2. Limpiar formulario
-              this.registroForm.reset();
-              this.submitted = false;
+              // Luego obtenemos y guardamos los datos del usuario
+              this.httpService.getUsuarioActual().subscribe({
+                next: (usuario) => {
+                  this.storageService.guardarUsuario(usuario);
 
-              // 3. Redirigir a /home
-              this.router.navigate(['/home']);
+                  // 2. Limpiar formulario
+                  this.registroForm.reset();
+                  this.submitted = false;
+
+                  // 3. Redirigir a /home
+                  this.router.navigate(['/home']);
+                },
+                error: () => {
+                  alert('Error al obtener los datos del usuario');
+                }
+              });
             },
             error: () => alert('Error al iniciar sesión automáticamente')
           });

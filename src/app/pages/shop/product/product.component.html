@@ -6,6 +6,24 @@
 
     <div class="col-md-6">
       <h2 class="mb-3">{{ producto.nombre }}</h2>
+
+      <!-- Calificación del producto -->
+      <div class="mb-3">
+        <div *ngIf="producto.calidad !== null; else sinCalificacionProducto" class="d-flex align-items-center mb-2">
+          <div class="estrellas me-2">
+            <i class="bi bi-star-fill" *ngFor="let star of [].constructor(producto.calidad)"></i>
+            <i class="bi bi-star" *ngFor="let star of [].constructor(5 - producto.calidad)"></i>
+          </div>
+          <span class="text-muted">({{ producto.calidad }}/5)</span>
+        </div>
+        <ng-template #sinCalificacionProducto>
+          <div class="sin-calificacion mb-2">
+            <i class="bi bi-star me-1"></i>
+            Sin calificaciones aún
+          </div>
+        </ng-template>
+      </div>
+
       <h4 class="text-primary mb-3">{{ producto.precio | currency:'EUR' }}</h4>
 
       <p><strong>Descripción:</strong></p>
@@ -13,13 +31,149 @@
 
       <p><strong>Categoría:</strong> {{ producto.categoriaId }}</p>
 
-      <p *ngIf="producto.stock > 0" class="text-success">✔ En stock: {{ producto.stock }} unidades</p>
-      <p *ngIf="producto.stock === 0" class="text-danger">❌ Sin stock disponible</p>
+      <!-- Información del vendedor -->
+      <div class="mb-4 border rounded p-3 bg-light">
+        <h5 class="mb-3"><i class="bi bi-person-circle me-2"></i>Información del Vendedor</h5>
+        <div *ngIf="vendedor">
+          <div class="row">
+            <div class="col-md-6">
+              <p class="mb-2">
+                <strong>Nombre:</strong><br>
+                {{ vendedor.nombre }} {{ vendedor.apellidos }}
+              </p>
+            </div>
+            <div class="col-md-6">
+              <p class="mb-2">
+                <strong>Nick:</strong><br>
+                {{ vendedor.nick }}
+              </p>
+            </div>
+          </div>
+          <div class="row mt-2">
+            <div class="col-12">
+              <p class="mb-0">
+                <strong>Email:</strong><br>
+                <a href="mailto:{{ vendedor.email }}" class="text-primary">
+                  {{ vendedor.email }}
+                </a>
+              </p>
+            </div>
+          </div>
+        </div>
+        <div *ngIf="!vendedor" class="text-muted">
+          <div class="d-flex align-items-center">
+            <div class="spinner-border spinner-border-sm me-2" role="status">
+              <span class="visually-hidden">Cargando...</span>
+            </div>
+            <span>Cargando información del vendedor...</span>
+          </div>
+        </div>
+      </div>
 
-      <!-- Más adelante se añadirá al carrito -->
-      <button class="btn btn-outline-primary mt-3" disabled>
-        Añadir al carrito
-      </button>
+      <!-- Estado del stock -->
+      <div class="mb-4">
+        <p *ngIf="producto.stock > 0" class="text-success mb-2">
+          <i class="bi bi-check-circle me-2"></i>
+          En stock: {{ producto.stock }} unidades
+        </p>
+        <p *ngIf="producto.stock === 0" class="text-danger mb-2">
+          <i class="bi bi-x-circle me-2"></i>
+          Sin stock disponible
+        </p>
+
+        <!-- Selector de cantidad -->
+        <div *ngIf="producto.stock > 0" class="d-flex align-items-center mb-3">
+          <label class="me-3">Cantidad:</label>
+          <div class="input-group" style="width: 150px;">
+            <button class="btn btn-outline-secondary" type="button" (click)="decrementarCantidad()"
+                    [disabled]="cantidad <= 1">
+              <i class="bi bi-dash"></i>
+            </button>
+            <input type="number" class="form-control text-center" [(ngModel)]="cantidad"
+                   min="1" [max]="producto.stock">
+            <button class="btn btn-outline-secondary" type="button" (click)="incrementarCantidad()"
+                    [disabled]="cantidad >= producto.stock">
+              <i class="bi bi-plus"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Botón de añadir al carrito -->
+        <button class="btn btn-primary w-100"
+                (click)="agregarAlCarrito()"
+                [disabled]="producto.stock === 0">
+          <i class="bi bi-cart-plus me-2"></i>
+          Añadir al carrito
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sección de comentarios y calificaciones -->
+  <div class="row mt-5">
+    <div class="col-12">
+      <h3 class="mb-4">Comentarios y Calificaciones</h3>
+
+      <!-- Formulario para nuevo comentario -->
+      <div class="card mb-4" *ngIf="usuarioActual">
+        <div class="card-body">
+          <h5 class="card-title mb-3">Deja tu opinión</h5>
+
+          <!-- Selector de calificación -->
+          <div class="mb-3">
+            <label class="form-label">Tu calificación:</label>
+            <div class="estrellas-seleccion">
+              <i class="bi"
+                 *ngFor="let star of [1,2,3,4,5]"
+                 [class.bi-star-fill]="star <= calificacion"
+                 [class.bi-star]="star > calificacion"
+                 (click)="calificacion = star"
+                 (mouseenter)="hoverCalificacion = star"
+                 (mouseleave)="hoverCalificacion = 0"
+                 [class.hovered]="star <= hoverCalificacion"></i>
+            </div>
+          </div>
+
+          <!-- Campo de comentario -->
+          <div class="mb-3">
+            <label class="form-label">Tu comentario:</label>
+            <textarea class="form-control"
+                      rows="3"
+                      [(ngModel)]="nuevoComentario"
+                      placeholder="Escribe tu opinión sobre el producto..."></textarea>
+          </div>
+
+          <button class="btn btn-primary"
+                  (click)="enviarComentario()"
+                  [disabled]="!nuevoComentario.trim()">
+            Publicar comentario
+          </button>
+        </div>
+      </div>
+
+      <!-- Lista de comentarios -->
+      <div class="comentarios-lista">
+        <div *ngFor="let comentario of comentarios" class="card mb-3">
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-start mb-2">
+              <div>
+                <h6 class="mb-0">{{ comentario.usuarioNick }}</h6>
+                <div class="estrellas">
+                  <i class="bi bi-star-fill" *ngFor="let star of [].constructor(comentario.calificacion)"></i>
+                  <i class="bi bi-star" *ngFor="let star of [].constructor(5 - comentario.calificacion)"></i>
+                </div>
+              </div>
+            </div>
+            <p class="card-text">{{ comentario.comentario }}</p>
+          </div>
+        </div>
+
+        <!-- Mensaje cuando no hay comentarios -->
+        <div *ngIf="comentarios.length === 0" class="text-center text-muted py-4">
+          <i class="bi bi-chat-left-dots display-4"></i>
+          <p class="mt-2">No hay comentarios todavía. ¡Sé el primero en opinar!</p>
+        </div>
+      </div>
     </div>
   </div>
 </div>

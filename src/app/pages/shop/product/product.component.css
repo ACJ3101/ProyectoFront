@@ -1,0 +1,69 @@
+/* Estilos para las estrellas */
+.estrellas {
+  color: #ffc107;
+  font-size: 0.9rem;
+}
+
+.estrellas .bi-star-fill,
+.estrellas .bi-star {
+  margin-right: 2px;
+}
+
+.estrellas .bi-star {
+  opacity: 0.5;
+}
+
+.sin-calificacion {
+  color: #6c757d;
+  font-size: 0.85rem;
+}
+
+/* Estilos para la selección de estrellas */
+.estrellas-seleccion {
+  display: inline-flex;
+  gap: 4px;
+}
+
+.estrellas-seleccion .bi {
+  color: #ffc107;
+  font-size: 1.5rem;
+  cursor: pointer;
+  transition: transform 0.2s, color 0.2s;
+}
+
+.estrellas-seleccion .bi:hover,
+.estrellas-seleccion .bi.hovered {
+  transform: scale(1.2);
+}
+
+.estrellas-seleccion .bi-star {
+  opacity: 0.5;
+}
+
+.estrellas-seleccion .bi-star-fill {
+  opacity: 1;
+}
+
+/* Estilos para la lista de comentarios */
+.comentarios-lista {
+  max-height: 500px;
+  overflow-y: auto;
+}
+
+.comentarios-lista::-webkit-scrollbar {
+  width: 8px;
+}
+
+.comentarios-lista::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+.comentarios-lista::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 4px;
+}
+
+.comentarios-lista::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}

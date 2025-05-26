@@ -1,0 +1,135 @@
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-md-8">
+      <!-- Perfil -->
+      <div class="card shadow mb-4">
+        <div class="card-body">
+          <h2 class="card-title text-center mb-4">Mi Perfil</h2>
+
+          <!-- Información actual -->
+          <div class="mb-4 text-center" *ngIf="usuario">
+            <div class="avatar mb-3">
+              <i class="bi bi-person-circle display-1 text-primary"></i>
+            </div>
+            <h4>{{ usuario.nombre }} {{ usuario.apellidos }}</h4>
+            <p class="text-muted">{{ usuario.email }}</p>
+            <span class="badge" [ngClass]="getRoleBadgeClass()">
+              {{ usuario.rol?.nombre }}
+            </span>
+          </div>
+
+          <!-- Formulario de edición -->
+          <form [formGroup]="profileForm" (ngSubmit)="onSubmit()" *ngIf="usuario" class="row">
+            <div class="col-md-6 mb-3">
+              <label class="form-label">Nombre</label>
+              <input type="text" class="form-control" formControlName="nombre">
+              <div class="text-danger small" *ngIf="profileForm.get('nombre')?.errors?.['required'] && profileForm.get('nombre')?.touched">
+                El nombre es requerido
+              </div>
+            </div>
+
+            <div class="col-md-6 mb-3">
+              <label class="form-label">Apellidos</label>
+              <input type="text" class="form-control" formControlName="apellidos">
+              <div class="text-danger small" *ngIf="profileForm.get('apellidos')?.errors?.['required'] && profileForm.get('apellidos')?.touched">
+                Los apellidos son requeridos
+              </div>
+            </div>
+
+            <div class="col-md-6 mb-3">
+              <label class="form-label">Nombre de usuario</label>
+              <input type="text" class="form-control" formControlName="nick">
+              <div class="text-danger small" *ngIf="profileForm.get('nick')?.errors?.['required'] && profileForm.get('nick')?.touched">
+                El nombre de usuario es requerido
+              </div>
+            </div>
+
+            <div class="col-md-6 mb-3">
+              <label class="form-label">Email</label>
+              <input type="email" class="form-control" formControlName="email">
+              <div class="text-danger small" *ngIf="profileForm.get('email')?.errors?.['required'] && profileForm.get('email')?.touched">
+                El email es requerido
+              </div>
+              <div class="text-danger small" *ngIf="profileForm.get('email')?.errors?.['email'] && profileForm.get('email')?.touched">
+                Ingrese un email válido
+              </div>
+            </div>
+
+            <div class="col-md-6 mb-3">
+              <label class="form-label">Dirección</label>
+              <input type="text" class="form-control" formControlName="direccion">
+              <div class="text-danger small" *ngIf="profileForm.get('direccion')?.errors?.['required'] && profileForm.get('direccion')?.touched">
+                La dirección es requerida
+              </div>
+            </div>
+
+            <div class="col-md-6 mb-3">
+              <label class="form-label">Rol</label>
+              <select class="form-select" formControlName="rolId">
+                <option [value]="ROLES.CLIENTE">Cliente</option>
+                <option [value]="ROLES.VENDEDOR">Vendedor</option>
+              </select>
+              <div class="form-text">
+                <i class="bi bi-info-circle me-1"></i>
+                Selecciona "Vendedor" si deseas publicar productos
+              </div>
+            </div>
+
+            <div class="col-12">
+              <div class="d-grid gap-2">
+                <button type="submit" class="btn btn-primary" [disabled]="profileForm.invalid || loading">
+                  <span *ngIf="loading" class="spinner-border spinner-border-sm me-2"></span>
+                  Guardar cambios
+                </button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Cambio de Contraseña -->
+      <div class="card shadow">
+        <div class="card-body">
+          <h3 class="card-title mb-4">Cambiar Contraseña</h3>
+          <form [formGroup]="passwordForm" (ngSubmit)="onPasswordSubmit()" class="row">
+            <div class="col-12 mb-3">
+              <label class="form-label">Nueva Contraseña</label>
+              <div class="input-group">
+                <input [type]="showPassword ? 'text' : 'password'"
+                       class="form-control"
+                       formControlName="nuevaContrasena"
+                       placeholder="Ingresa tu nueva contraseña">
+                <button class="btn btn-outline-secondary"
+                        type="button"
+                        (click)="togglePasswordVisibility()">
+                  <i class="bi" [ngClass]="showPassword ? 'bi-eye-slash' : 'bi-eye'"></i>
+                </button>
+              </div>
+              <div class="form-text text-muted mb-2">
+                <i class="bi bi-info-circle me-1"></i>
+                La nueva contraseña debe ser diferente a la actual
+              </div>
+              <div class="text-danger small" *ngIf="passwordForm.get('nuevaContrasena')?.errors?.['required'] && passwordForm.get('nuevaContrasena')?.touched">
+                La contraseña es requerida
+              </div>
+              <div class="text-danger small" *ngIf="passwordForm.get('nuevaContrasena')?.errors?.['minlength'] && passwordForm.get('nuevaContrasena')?.touched">
+                La contraseña debe tener al menos 6 caracteres
+              </div>
+            </div>
+
+            <div class="col-12">
+              <div class="d-grid gap-2">
+                <button type="submit"
+                        class="btn btn-outline-primary"
+                        [disabled]="passwordForm.invalid || loadingPassword">
+                  <span *ngIf="loadingPassword" class="spinner-border spinner-border-sm me-2"></span>
+                  Actualizar Contraseña
+                </button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

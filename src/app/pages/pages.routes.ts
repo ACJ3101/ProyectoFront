@@ -1,4 +1,6 @@
 import { Routes } from "@angular/router";
+import { adminGuard } from "../core/guards/admin.guard";
+import { profileGuard } from "../core/guards/profile.guard";
 
 
 export const PAGES_ROUTES: Routes = [
@@ -31,6 +33,16 @@ export const PAGES_ROUTES: Routes = [
       {
         path: 'cart',
         loadComponent: () => import('./cart/cart.component').then(m => m.CartComponent)
+      },
+      {
+        path: 'profile',
+        loadComponent: () => import('./profile/profile.component').then(m => m.ProfileComponent),
+        canActivate: [profileGuard]
+      },
+      {
+        path: 'admin',
+        loadComponent: () => import('./admin/admin.component').then(m => m.AdminComponent),
+        canActivate: [adminGuard]
       },
       {
         path: '**',

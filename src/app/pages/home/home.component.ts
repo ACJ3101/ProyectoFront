@@ -1,36 +1,64 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
+import { RouterModule } from '@angular/router';
+import { HttpService } from '../../core/services/http/http.service';
+import { Producto } from '../../core/models/interfaces';
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, RouterModule],
   templateUrl: './home.component.html',
-  styleUrl: './home.component.css'
+  styleUrls: ['./home.component.css']
 })
 export class HomeComponent implements OnInit {
-productosDestacados = [
-    {
-      nombre: 'Muñeco Amigurumi',
-      descripcion: 'Hecho a mano con hilo de algodón.',
-      precio: 19.99,
-      imagenUrl: 'https://cdn.pixabay.com/photo/2017/01/23/20/21/amigurumi-2002923_1280.jpg'
-    },
-    {
-      nombre: 'Gorro de Crochet',
-      descripcion: 'Perfecto para invierno, cálido y estiloso.',
-      precio: 14.50,
-      imagenUrl: 'https://cdn.pixabay.com/photo/2015/10/12/14/57/beanie-983395_1280.jpg'
-    },
-    {
-      nombre: 'Cojín Decorativo',
-      descripcion: 'Ideal para darle un toque artesanal a tu hogar.',
-      precio: 22.00,
-      imagenUrl: 'https://cdn.pixabay.com/photo/2017/11/11/11/55/crochet-2938453_1280.jpg'
+  productosDestacados: Producto[] = [];
+  todosLosProductos: Producto[] = [];
+
+  constructor(
+    private httpService: HttpService
+  ) {}
+
+  ngOnInit(): void {
+    this.cargarProductos();
+  }
+
+  cargarProductos(): void {
+    this.httpService.getProductos().subscribe({
+      next: (productos) => {
+        this.todosLosProductos = productos.filter(p => p.publicado);
+        this.actualizarProductosDestacados();
+      },
+      error: (error) => {
+        console.error('Error al cargar productos:', error);
+      }
+    });
+  }
+
+  private actualizarProductosDestacados(): void {
+    if (this.todosLosProductos.length === 0) return;
+
+    // Filtrar productos que tienen calificación
+    const productosConCalificacion = this.todosLosProductos.filter(p => p.calidad !== null);
+
+    if (productosConCalificacion.length === 0) {
+      // Si no hay productos calificados, mostrar los 3 primeros productos disponibles
+      this.productosDestacados = this.todosLosProductos.slice(0, 3);
+      return;
     }
-  ];
 
-  constructor() {}
+    // Ordenar productos por calificación de mayor a menor
+    const productosOrdenados = productosConCalificacion.sort((a, b) => {
+      if (b.calidad === null) return -1;
+      if (a.calidad === null) return 1;
+      return b.calidad - a.calidad;
+    });
 
-  ngOnInit(): void {}
+    // Tomar los 3 productos con mejor calificación
+    this.productosDestacados = productosOrdenados.slice(0, 3);
+  }
+
+  handleImageError(event: any): void {
+    event.target.src = 'assets/placeholder.jpg';
+  }
 }

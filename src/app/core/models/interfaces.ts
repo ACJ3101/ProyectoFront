@@ -15,9 +15,15 @@ export interface Usuario {
   rol?: any;
 }
 
+export const ROLES = {
+  CLIENTE: 1,
+  VENDEDOR: 2,
+  ADMIN: 3
+} as const;
+
 export interface Rol {
   id: number;
-  nombre?: string;
+  nombre: string;
 }
 
 export interface Producto {
@@ -26,9 +32,13 @@ export interface Producto {
   descripcion: string;
   precio: number;
   stock: number;
-  imagenUrl?: string;
-  categoriaId : number;
-  usuario?: Usuario;
+  imagenUrl: string;
+  fechaCreacion: string;
+  publicado: boolean;
+  categoriaId: number;
+  usuarioId: number;
+  usuarioNick: string;
+  calidad: number | null;
 }
 
 export interface Pedido {
@@ -60,6 +70,15 @@ export interface PublicacionBlog {
   contenido: string;
   fechaPublicacion: string;
   autor: Usuario;
+}
+
+export interface Comentario {
+  id?: number;
+  comentario: string;
+  calificacion: number;
+  usuarioId: number;
+  usuarioNick?: string;
+  productoId: number;
 }
 
 

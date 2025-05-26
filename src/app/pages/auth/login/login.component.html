@@ -27,11 +27,15 @@
               <!-- Contraseña -->
               <div class="form-outline mb-4">
                 <label class="form-label">Contraseña</label>
-                <input [type]="isVisible ? 'password' : 'text'" class="form-control" formControlName="password" />
+                <div class="input-group">
+                  <input [type]="isVisible ? 'text' : 'password'" class="form-control" formControlName="password" />
+                  <button class="btn btn-outline-secondary" type="button" (click)="changeVisible()">
+                    <i class="bi" [ngClass]="isVisible ? 'bi-eye-slash' : 'bi-eye'"></i>
+                  </button>
+                </div>
                 <div *ngIf="formSubmitted && loginForm.controls['password'].invalid" class="text-danger">
                   La contraseña es obligatoria
                 </div>
-                <a href="#" class="small" (click)="changeVisible()">Mostrar/Ocultar</a>
               </div>
 
               <!-- Recuerdame -->

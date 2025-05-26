@@ -1,15 +1,15 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { Producto, Usuario, Categoria } from '../../models/interfaces';
-import { log } from 'console';
+import { Producto, Usuario, Categoria, Comentario } from '../../models/interfaces';
 
 @Injectable({
   providedIn: 'root'
 })
 export class HttpService {
 
-  private baseUrl = 'http://localhost:8080/api'; // Cambia si usas otro puerto
+  private baseUrl = 'http://localhost:8080/api';
+
 
   constructor(private http: HttpClient) { }
 
@@ -29,35 +29,45 @@ export class HttpService {
   // ✅ USUARIOS
   // ----------------------------
 
-  getUsuarios(token: string): Observable<any> {
-    return this.http.get(`${this.baseUrl}/usuarios`, {
-      headers: this.authHeaders(token)
-    });
+  getUsuarios(): Observable<any> {
+    return this.http.get(`${this.baseUrl}/usuarios`);
   }
 
   getUsuarioPorEmail(email: string): Observable<Usuario> {
-    const token = this.getToken();
-    const headers = this.authHeaders(token);
     const emailCodificado = encodeURIComponent(email);
     return this.http.get<Usuario>(
-      `${this.baseUrl}/usuarios/buscarPorEmail?email=${emailCodificado}`,
-      { headers }
+      `${this.baseUrl}/usuarios/buscarPorEmail?email=${emailCodificado}`
     );
   }
 
-  getUsuarioActual(): Observable<Usuario> {
-    return this.http.get<Usuario>(`${this.baseUrl}/usuarios/me`, {
-      headers: this.authHeaders(this.getToken())
-    });
+  getUsuarioPorId(id: number): Observable<Usuario> {
+    return this.http.get<Usuario>(`${this.baseUrl}/usuarios/${id}`);
   }
 
-  private getToken(): string {
-    const token = localStorage.getItem('token');
-    return token || '';
+  getUsuarioActual(): Observable<Usuario> {
+    return this.http.get<Usuario>(`${this.baseUrl}/usuarios/me`);
   }
 
   crearUsuario(usuario: Usuario): Observable<Usuario> {
-    return this.http.post<Usuario>('http://localhost:8080/api/usuarios/crearUsuario', usuario)
+    return this.http.post<Usuario>(`${this.baseUrl}/usuarios/crearUsuario`, usuario);
+  }
+
+  actualizarUsuario(datos: {
+    id: number;
+    nombre: string;
+    apellidos: string;
+    rolId: number;
+    email: string;
+    direccion: string;
+    nick: string;
+  }): Observable<any> {
+    return this.http.put(`${this.baseUrl}/usuarios/${datos.id}`, datos);
+  }
+
+  cambiarContrasena(userId: number, nuevaContrasena: string): Observable<any> {
+    return this.http.put(`${this.baseUrl}/usuarios/${userId}/cambiarContrasena`, {
+      nuevaContrasena
+    });
   }
 
   // ----------------------------
@@ -68,22 +78,20 @@ export class HttpService {
     return this.http.get<Producto[]>(`${this.baseUrl}/productos`);
   }
 
-  getProductosPorUsuario(usuarioId: number, token: string): Observable<Producto[]> {
-    return this.http.get<Producto[]>(`${this.baseUrl}/productos/usuario/${usuarioId}`, {
-      headers: this.authHeaders(this.getToken())
-    });
+  getProductosPorUsuario(usuarioId: number): Observable<Producto[]> {
+    return this.http.get<Producto[]>(`${this.baseUrl}/productos/usuario/${usuarioId}`);
   }
 
-  crearProducto(data: any, token: string): Observable<any> {
-    return this.http.post(`${this.baseUrl}/productos`, data, {
-      headers: this.authHeaders(token)
-    });
+  crearProducto(data: any): Observable<any> {
+    return this.http.post(`${this.baseUrl}/productos`, data);
   }
 
-  actualizarProducto(id: number, data: any, token: string): Observable<any> {
-    return this.http.put(`${this.baseUrl}/productos/${id}`, data, {
-      headers: this.authHeaders(token)
-    });
+  actualizarProducto(id: number, data: any): Observable<any> {
+    return this.http.put(`${this.baseUrl}/productos/${id}`, data);
+  }
+
+  eliminarProducto(id: number): Observable<any> {
+    return this.http.delete(`${this.baseUrl}/productos/${id}`);
   }
 
   getProductosPorCategoria(categoriaId: number): Observable<Producto[]> {
@@ -99,19 +107,24 @@ export class HttpService {
   // ----------------------------
 
   getCategorias(): Observable<Categoria[]> {
-    const token = this.getToken();
-    const headers = this.authHeaders(token);
-
-    return this.http.get<Categoria[]>(`${this.baseUrl}/categorias`, {
-      headers: headers
-    });
+    return this.http.get<Categoria[]>(`${this.baseUrl}/categorias`);
   }
 
-  // ----------------------------
-  // ⚙️ UTILIDAD
-  // ----------------------------
+  // Métodos para comentarios
+  getComentarios(): Observable<Comentario[]> {
+    return this.http.get<Comentario[]>(`${this.baseUrl}/comentarios`);
+  }
 
-  private authHeaders(token: string): HttpHeaders {
-    return new HttpHeaders().set('Authorization', `Bearer ${token}`);
+
+  getComentariosPorProducto(productoId: number): Observable<Comentario[]> {
+    return this.http.get<Comentario[]>(`${this.baseUrl}/comentarios/producto/${productoId}`);
+  }
+
+  crearComentario(comentario: Omit<Comentario, 'id' | 'usuarioNick'>): Observable<Comentario> {
+    return this.http.post<Comentario>(`${this.baseUrl}/comentarios`, comentario);
+  }
+
+  eliminarComentario(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.baseUrl}/comentarios/${id}`);
   }
 }

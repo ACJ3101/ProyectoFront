@@ -1,0 +1,66 @@
+.producto-card {
+  transition: all 0.8s ease-in-out;
+  opacity: 1;
+}
+
+.producto-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1) !important;
+}
+
+/* Animación de fade para los productos */
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  20% {
+    opacity: 0.2;
+  }
+  60% {
+    opacity: 0.6;
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeOut {
+  0% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+}
+
+.producto-animado {
+  animation: fadeIn 1.2s ease-in-out forwards;
+}
+
+.producto-saliendo {
+  animation: fadeOut 0.8s ease-in-out forwards;
+}
+
+/* Estilos para las estrellas */
+.estrellas {
+  color: #ffc107; /* Color amarillo para las estrellas */
+  font-size: 0.9rem;
+}
+
+.estrellas .bi-star-fill {
+  margin-right: 2px;
+}
+
+.estrellas .bi-star {
+  margin-right: 2px;
+  opacity: 0.5;
+}
+
+.sin-calificacion {
+  color: #6c757d;
+  font-size: 0.85rem;
+}

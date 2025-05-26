@@ -1,6 +1,7 @@
 import { Injectable, PLATFORM_ID, Inject } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 import { Usuario } from '../../models/interfaces';
+import { AuthResponse } from '../../models/access-token';
 import { isPlatformBrowser } from '@angular/common';
 
 @Injectable({
@@ -10,6 +11,8 @@ export class StorageService {
 
   private readonly USER_KEY = 'usuario';
   private readonly EMAIL_KEY = 'lastEmail';
+  private readonly TOKEN_KEY = 'accessToken';
+  private readonly REFRESH_TOKEN_KEY = 'refreshToken';
 
   private usuarioSubject = new BehaviorSubject<Usuario | null>(null);
   usuario$ = this.usuarioSubject.asObservable();
@@ -29,7 +32,7 @@ export class StorageService {
     }
   }
 
-  guardarUsuario(usuario: Usuario, token: string): void {
+  guardarUsuario(usuario: Usuario): void {
     if (this.isBrowser()) {
       const usuarioFiltrado: Usuario = {
         id: usuario.id,
@@ -43,7 +46,6 @@ export class StorageService {
       try {
         localStorage.setItem(this.EMAIL_KEY, usuario.email);
         localStorage.setItem(this.USER_KEY, JSON.stringify(usuarioFiltrado));
-        localStorage.setItem('token', token);
         this.usuarioSubject.next(usuarioFiltrado);
       } catch (error) {
         console.error('Error al guardar en localStorage:', error);
@@ -73,13 +75,45 @@ export class StorageService {
   obtenerToken(): string | null {
     if (this.isBrowser()) {
       try {
-        return localStorage.getItem('token');
+        return localStorage.getItem(this.TOKEN_KEY);
       } catch (error) {
         console.error('Error al obtener token del localStorage:', error);
         return null;
       }
     }
     return null;
+  }
+
+  obtenerRefreshToken(): string | null {
+    if (this.isBrowser()) {
+      try {
+        return localStorage.getItem(this.REFRESH_TOKEN_KEY);
+      } catch (error) {
+        console.error('Error al obtener refresh token del localStorage:', error);
+        return null;
+      }
+    }
+    return null;
+  }
+
+  guardarToken(token: string): void {
+    if (this.isBrowser()) {
+      try {
+        localStorage.setItem(this.TOKEN_KEY, token);
+      } catch (error) {
+        console.error('Error al guardar token en localStorage:', error);
+      }
+    }
+  }
+
+  guardarRefreshToken(token: string): void {
+    if (this.isBrowser()) {
+      try {
+        localStorage.setItem(this.REFRESH_TOKEN_KEY, token);
+      } catch (error) {
+        console.error('Error al guardar refresh token en localStorage:', error);
+      }
+    }
   }
 
   obtenerUltimoEmail(): string | null {
@@ -109,7 +143,7 @@ export class StorageService {
     }
   }
 
-  borrarLocalStorage(): void {
+  limpiarStorage(): void {
     if (this.isBrowser()) {
       try {
         localStorage.clear();
@@ -118,6 +152,10 @@ export class StorageService {
         console.error('Error al limpiar localStorage:', error);
       }
     }
+  }
+
+  borrarLocalStorage(): void {
+    this.limpiarStorage();
   }
 
   existeUsuario(): boolean {

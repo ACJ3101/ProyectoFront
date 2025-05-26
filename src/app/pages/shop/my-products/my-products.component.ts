@@ -17,8 +17,12 @@ export class MyProductsComponent implements OnInit {
   productos: Producto[] = [];
   categorias: Categoria[] = [];
   productoForm: FormGroup;
+  productoCreacionForm: FormGroup;
   modalVisible = false;
+  modalEliminacionVisible = false;
+  modalCreacionVisible = false;
   productoSeleccionado: Producto | null = null;
+  productoAEliminar: Producto | null = null;
 
   constructor(
     private httpService: HttpService,
@@ -31,7 +35,18 @@ export class MyProductsComponent implements OnInit {
       precio: ['', [Validators.required, Validators.min(0)]],
       stock: ['', [Validators.required, Validators.min(0)]],
       imagenUrl: ['', [Validators.required, Validators.pattern('https?://.+')]],
-      categoria: ['', Validators.required]
+      categoriaId: ['', Validators.required],
+      publicado: [true]
+    });
+
+    this.productoCreacionForm = this.fb.group({
+      nombre: ['', [Validators.required, Validators.minLength(3)]],
+      descripcion: ['', [Validators.required, Validators.minLength(10)]],
+      precio: ['', [Validators.required, Validators.min(0)]],
+      stock: ['', [Validators.required, Validators.min(0)]],
+      imagenUrl: ['', [Validators.required, Validators.pattern('https?://.+')]],
+      categoriaId: ['', Validators.required],
+      publicado: [true]
     });
   }
 
@@ -59,14 +74,11 @@ export class MyProductsComponent implements OnInit {
 
   cargarProductos(): void {
     const usuario = this.storageService.obtenerUsuario();
-    const token = this.storageService.obtenerToken();
 
-    if (usuario && usuario.id && token) {
-      this.httpService.getProductosPorUsuario(usuario.id, token).subscribe({
+    if (usuario && usuario.id) {
+      this.httpService.getProductosPorUsuario(usuario.id).subscribe({
         next: (productos) => {
           this.productos = productos;
-          this.productos.forEach(producto => {
-          });
         },
         error: (error) => {
           console.error('Error al cargar los productos:', error);
@@ -83,8 +95,10 @@ export class MyProductsComponent implements OnInit {
       precio: producto.precio,
       stock: producto.stock,
       imagenUrl: producto.imagenUrl,
-      categoria: producto.categoriaId // Este es el ID de la categoría
+      categoriaId: producto.categoriaId,
+      publicado: producto.publicado
     });
+    console.log(this.productoForm.value);
     this.modalVisible = true;
   }
 
@@ -96,24 +110,28 @@ export class MyProductsComponent implements OnInit {
 
   guardarCambios(): void {
     if (this.productoForm.valid && this.productoSeleccionado) {
-      const token = this.storageService.obtenerToken();
-      if (!token) {
-        console.error('No hay token disponible');
-        return;
-      }
-
       const productoActualizado = {
-        ...this.productoSeleccionado,
-        ...this.productoForm.value
+        nombre: this.productoForm.value.nombre,
+        descripcion: this.productoForm.value.descripcion,
+        precio: this.productoForm.value.precio,
+        stock: this.productoForm.value.stock,
+        imagenUrl: this.productoForm.value.imagenUrl,
+        publicado: this.productoForm.value.publicado,
+        categoriaId: this.productoForm.value.categoriaId
       };
 
-      this.httpService.actualizarProducto(this.productoSeleccionado.id!, productoActualizado, token).subscribe({
+      this.httpService.actualizarProducto(this.productoSeleccionado.id!, productoActualizado).subscribe({
         next: () => {
           this.cerrarModal();
           this.cargarProductos();
         },
         error: (error) => {
+          if (error.status === 200) {
+            this.cerrarModal();
+            this.cargarProductos();
+          } else {
           console.error('Error al actualizar el producto:', error);
+          }
         }
       });
     }
@@ -145,7 +163,99 @@ export class MyProductsComponent implements OnInit {
   }
 
   get categoriaInvalida(): boolean {
-    return this.productoForm.get('categoria')?.invalid &&
-           this.productoForm.get('categoria')?.touched || false;
+    return this.productoForm.get('categoriaId')?.invalid &&
+           this.productoForm.get('categoriaId')?.touched || false;
+  }
+
+  eliminarProducto(producto: Producto): void {
+    this.productoAEliminar = producto;
+    this.modalEliminacionVisible = true;
+  }
+
+  cerrarModalEliminacion(): void {
+    this.modalEliminacionVisible = false;
+    this.productoAEliminar = null;
+  }
+
+  confirmarEliminacion(): void {
+    if (this.productoAEliminar) {
+      this.httpService.eliminarProducto(this.productoAEliminar.id!).subscribe({
+        next: () => {
+          this.cerrarModalEliminacion();
+          this.cargarProductos();
+        },
+        error: (error) => {
+          console.error('Error al eliminar el producto:', error);
+          alert('Error al eliminar el producto');
+        }
+      });
+    }
+  }
+
+  abrirModalCreacion(): void {
+    this.modalCreacionVisible = true;
+  }
+
+  cerrarModalCreacion(): void {
+    this.modalCreacionVisible = false;
+    this.productoCreacionForm.reset({
+      publicado: true
+    });
+  }
+
+  crearProducto(): void {
+    if (this.productoCreacionForm.valid) {
+      const usuario = this.storageService.obtenerUsuario();
+      if (!usuario) {
+        console.error('No hay usuario autenticado');
+        return;
+      }
+
+      const nuevoProducto = {
+        ...this.productoCreacionForm.value,
+        usuarioId: usuario.id
+      };
+
+      this.httpService.crearProducto(nuevoProducto).subscribe({
+        next: () => {
+          this.cerrarModalCreacion();
+          this.cargarProductos();
+        },
+        error: (error) => {
+          console.error('Error al crear el producto:', error);
+          alert('Error al crear el producto');
+        }
+      });
+    }
+  }
+
+  get nombreInvalidoCreacion(): boolean {
+    return this.productoCreacionForm.get('nombre')?.invalid &&
+           this.productoCreacionForm.get('nombre')?.touched || false;
+  }
+
+  get descripcionInvalidaCreacion(): boolean {
+    return this.productoCreacionForm.get('descripcion')?.invalid &&
+           this.productoCreacionForm.get('descripcion')?.touched || false;
+  }
+
+  get precioInvalidoCreacion(): boolean {
+    return this.productoCreacionForm.get('precio')?.invalid &&
+           this.productoCreacionForm.get('precio')?.touched || false;
+  }
+
+  get stockInvalidoCreacion(): boolean {
+    return this.productoCreacionForm.get('stock')?.invalid &&
+           this.productoCreacionForm.get('stock')?.touched || false;
+  }
+
+  get imagenUrlInvalidaCreacion(): boolean {
+    return this.productoCreacionForm.get('imagenUrl')?.invalid &&
+           this.productoCreacionForm.get('imagenUrl')?.touched || false;
+  }
+
+  get categoriaInvalidaCreacion(): boolean {
+    return this.productoCreacionForm.get('categoriaId')?.invalid &&
+           this.productoCreacionForm.get('categoriaId')?.touched || false;
   }
 }

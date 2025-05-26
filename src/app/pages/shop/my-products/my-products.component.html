@@ -3,7 +3,7 @@
   <!-- Título de la sección -->
   <div class="d-flex justify-content-between align-items-center mb-4">
     <h2>Mis Productos</h2>
-    <button class="btn btn-primary">
+    <button class="btn btn-primary" (click)="abrirModalCreacion()">
       <i class="bi bi-plus-circle me-2"></i>
       Añadir Producto
     </button>
@@ -40,7 +40,7 @@
               <i class="bi bi-pencil me-1"></i>
               Editar
             </button>
-            <button class="btn btn-outline-danger btn-sm">
+            <button class="btn btn-outline-danger btn-sm" (click)="eliminarProducto(producto)">
               <i class="bi bi-trash me-1"></i>
               Eliminar
             </button>
@@ -115,15 +115,11 @@
           <!-- Categoría -->
           <div class="mb-3">
             <label class="form-label">Categoría</label>
-            <!-- Categoría actual -->
-            <div class="d-flex align-items-center mb-2" *ngIf="productoSeleccionado">
-              <span class="badge bg-info me-2">Categoría actual:</span>
-              <span>{{ obtenerNombreCategoria(productoSeleccionado.categoriaId) }}</span>
-            </div>
+
             <!-- Selector de nueva categoría -->
-            <select class="form-select" formControlName="categoria"
+            <select class="form-select" formControlName="categoriaId"
                     [class.is-invalid]="categoriaInvalida">
-              <option value="">Selecciona una nueva categoría</option>
+              <option value="">Selecciona una categoría</option>
               <option *ngFor="let cat of categorias" [value]="cat.id">
                 {{ cat.nombre }}
               </option>
@@ -132,16 +128,25 @@
               Debes seleccionar una categoría
             </div>
           </div>
-        </form>
-      </div>
 
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" (click)="cerrarModal()">Cancelar</button>
-        <button type="button" class="btn btn-primary"
-                [disabled]="productoForm.invalid"
-                (click)="guardarCambios()">
-          Guardar cambios
-        </button>
+          <!-- Estado de publicación -->
+          <div class="mb-3">
+            <div class="form-check">
+              <input type="checkbox" class="form-check-input" formControlName="publicado" id="publicado">
+              <label class="form-check-label" for="publicado">
+                Producto publicado
+              </label>
+            </div>
+          </div>
+
+          <!-- Botones del modal -->
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" (click)="cerrarModal()">Cancelar</button>
+            <button type="submit" class="btn btn-primary" [disabled]="!productoForm.valid">
+              Guardar cambios
+            </button>
+          </div>
+        </form>
       </div>
     </div>
   </div>
@@ -149,3 +154,129 @@
 
 <!-- Overlay del modal -->
 <div class="modal-backdrop fade show" *ngIf="modalVisible"></div>
+
+<!-- Modal de confirmación de eliminación -->
+<div class="modal" [class.show]="modalEliminacionVisible" [style.display]="modalEliminacionVisible ? 'block' : 'none'">
+  <div class="modal-dialog modal-dialog-centered modal-sm">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Confirmar eliminación</h5>
+        <button type="button" class="btn-close" (click)="cerrarModalEliminacion()"></button>
+      </div>
+      <div class="modal-body">
+        <p>¿Estás seguro de que deseas eliminar el producto "{{ productoAEliminar?.nombre }}"?</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="cerrarModalEliminacion()">Cancelar</button>
+        <button type="button" class="btn btn-danger" (click)="confirmarEliminacion()">
+          Eliminar
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Overlay del modal de eliminación -->
+<div class="modal-backdrop fade show" *ngIf="modalEliminacionVisible"></div>
+
+<!-- Modal de creación -->
+<div class="modal" [class.show]="modalCreacionVisible" [style.display]="modalCreacionVisible ? 'block' : 'none'">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Crear Nuevo Producto</h5>
+        <button type="button" class="btn-close" (click)="cerrarModalCreacion()"></button>
+      </div>
+
+      <div class="modal-body">
+        <form [formGroup]="productoCreacionForm" (ngSubmit)="crearProducto()">
+          <!-- Nombre -->
+          <div class="mb-3">
+            <label class="form-label">Nombre</label>
+            <input type="text" class="form-control" formControlName="nombre"
+                   [class.is-invalid]="nombreInvalidoCreacion">
+            <div class="invalid-feedback" *ngIf="nombreInvalidoCreacion">
+              El nombre es requerido y debe tener al menos 3 caracteres
+            </div>
+          </div>
+
+          <!-- Descripción -->
+          <div class="mb-3">
+            <label class="form-label">Descripción</label>
+            <textarea class="form-control" rows="3" formControlName="descripcion"
+                      [class.is-invalid]="descripcionInvalidaCreacion"></textarea>
+            <div class="invalid-feedback" *ngIf="descripcionInvalidaCreacion">
+              La descripción es requerida y debe tener al menos 10 caracteres
+            </div>
+          </div>
+
+          <!-- Precio -->
+          <div class="mb-3">
+            <label class="form-label">Precio</label>
+            <input type="number" class="form-control" formControlName="precio"
+                   [class.is-invalid]="precioInvalidoCreacion">
+            <div class="invalid-feedback" *ngIf="precioInvalidoCreacion">
+              El precio debe ser mayor a 0
+            </div>
+          </div>
+
+          <!-- Stock -->
+          <div class="mb-3">
+            <label class="form-label">Stock</label>
+            <input type="number" class="form-control" formControlName="stock"
+                   [class.is-invalid]="stockInvalidoCreacion">
+            <div class="invalid-feedback" *ngIf="stockInvalidoCreacion">
+              El stock debe ser mayor o igual a 0
+            </div>
+          </div>
+
+          <!-- URL de la imagen -->
+          <div class="mb-3">
+            <label class="form-label">URL de la imagen</label>
+            <input type="url" class="form-control" formControlName="imagenUrl"
+                   [class.is-invalid]="imagenUrlInvalidaCreacion">
+            <div class="invalid-feedback" *ngIf="imagenUrlInvalidaCreacion">
+              Debe ser una URL válida (http:// o https://)
+            </div>
+          </div>
+
+          <!-- Categoría -->
+          <div class="mb-3">
+            <label class="form-label">Categoría</label>
+            <select class="form-select" formControlName="categoriaId"
+                    [class.is-invalid]="categoriaInvalidaCreacion">
+              <option value="">Selecciona una categoría</option>
+              <option *ngFor="let cat of categorias" [value]="cat.id">
+                {{ cat.nombre }}
+              </option>
+            </select>
+            <div class="invalid-feedback" *ngIf="categoriaInvalidaCreacion">
+              Debes seleccionar una categoría
+            </div>
+          </div>
+
+          <!-- Estado de publicación -->
+          <div class="mb-3">
+            <div class="form-check">
+              <input type="checkbox" class="form-check-input" formControlName="publicado" id="publicadoCreacion">
+              <label class="form-check-label" for="publicadoCreacion">
+                Producto publicado
+              </label>
+            </div>
+          </div>
+
+          <!-- Botones del modal -->
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" (click)="cerrarModalCreacion()">Cancelar</button>
+            <button type="submit" class="btn btn-primary" [disabled]="!productoCreacionForm.valid">
+              Crear Producto
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Overlay del modal de creación -->
+<div class="modal-backdrop fade show" *ngIf="modalCreacionVisible"></div>

@@ -2,11 +2,14 @@
   <div class="container-fluid">
     <div class="row w-100 align-items-center">
       <!-- 🧍 Izquierda: Nombre o Invitado -->
-      <div class="col-md-4 d-flex align-items-center">
+      <div class="col-md-3 d-flex align-items-center">
         <i class="bi bi-person-fill me-2"></i>
 
         <ng-container *ngIf="estaLogueado(); else noLogin">
-          <span class="text-black">Hola, {{ usuarioNombre }}</span>
+          <span class="text-black me-2">Hola, {{ usuarioNombre }}</span>
+          <a class="nav-link text-primary" routerLink="/profile" *ngIf="usuarioRol !== 'ADMIN'">
+            <i class="bi bi-gear-fill"></i>
+          </a>
         </ng-container>
 
         <ng-template #noLogin>
@@ -15,7 +18,7 @@
       </div>
 
       <!-- 🔗 Centro: enlaces -->
-      <div class="col-md-4">
+      <div class="col-md-6">
         <ul class="navbar-nav justify-content-center flex-row gap-3">
           <li class="nav-item">
             <a class="nav-link" routerLink="/home">Home</a>
@@ -23,49 +26,49 @@
           <li class="nav-item">
             <a class="nav-link" routerLink="/shop/home">Tienda</a>
           </li>
-          <li class="nav-item" *ngIf="estaLogueado() && (usuarioRol === 'CREADOR' || usuarioRol === 'ADMIN')">
-            <a class="nav-link" routerLink="/shop/mis-productos">
-              <i class="bi bi-box-seam me-1"></i>Mis Productos
-            </a>
-          </li>
           <li class="nav-item">
             <a class="nav-link" routerLink="/contact">Contacto</a>
           </li>
           <li class="nav-item">
             <a class="nav-link" routerLink="/blog">Blog</a>
           </li>
+          <li class="nav-item" *ngIf="estaLogueado() && (usuarioRol === 'CREADOR' || usuarioRol === 'ADMIN')">
+            <a class="nav-link d-flex align-items-center" routerLink="/shop/mis-productos">
+              <i class="bi bi-box-seam me-1"></i>
+              <span class="nowrap">Mis Productos</span>
+            </a>
+          </li>
+          <li class="nav-item" *ngIf="estaLogueado() && usuarioRol === 'ADMIN'">
+            <a class="nav-link d-flex align-items-center" routerLink="/admin">
+              <i class="bi bi-shield-lock me-1"></i>
+              <span class="nowrap">Administración</span>
+            </a>
+          </li>
         </ul>
       </div>
 
       <!-- ⚙️ Derecha: login/logout y rol y carrito -->
-      <div class="col-md-4 d-flex justify-content-end align-items-center gap-3">
-        <ng-container>
-          <ul class="navbar-nav justify-content-center flex-row gap-3">
-            <li class="nav-item ms-3">
-              <a class="nav-link position-relative" routerLink="/cart">
-                <i class="bi bi-cart-fill fs-5"></i>
-                <span
-                  *ngIf="carritoCantidad > 0"
-                  class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
-                >
-                  {{ carritoCantidad }}
-                </span>
-              </a>
-            </li>
-          </ul>
-        </ng-container>
+      <div class="col-md-3 d-flex justify-content-end align-items-center">
+        <a class="nav-link position-relative me-3" routerLink="/cart">
+          <i class="bi bi-cart-fill fs-5"></i>
+          <span
+            *ngIf="carritoCantidad > 0"
+            class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+          >
+            {{ carritoCantidad }}
+          </span>
+        </a>
 
         <ng-container *ngIf="!estaLogueado(); else logueado">
-          <a class="nav-link" routerLink="/auth/login">Iniciar</a>
-          <a class="nav-link" routerLink="/auth/register">Registrarse</a>
+          <a class="nav-link me-2" routerLink="/auth/login">Iniciar</a>
+          <a class="nav-link me-2" routerLink="/auth/register">Registrarse</a>
         </ng-container>
 
         <ng-template #logueado>
-          <a class="nav-link" href="#" routerLink="/auth/login" (click)="logout()">Cerrar sesión</a>
+          <a class="nav-link me-2" href="#" routerLink="/auth/login" (click)="logout()">Cerrar sesión</a>
         </ng-template>
 
-        <!-- 🏷️ Mostrar el rol -->
-        <span class="nav-link disabled text-uppercase text-primary">
+        <span class="badge bg-light text-primary border border-primary">
           {{ estaLogueado() ? usuarioRol : "Invitado" }}
         </span>
       </div>
