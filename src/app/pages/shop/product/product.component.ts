@@ -111,7 +111,7 @@ export class ProductComponent implements OnInit {
         this.nuevoComentario = '';
         this.calificacion = 5;
         this.cargarComentarios(this.producto.id!);
-      },
+        },
       error: (error: unknown) => {
         console.error('Error al publicar el comentario:', error);
         this.toastService.show('Error al publicar el comentario', 'error');

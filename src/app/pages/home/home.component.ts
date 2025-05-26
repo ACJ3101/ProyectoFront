@@ -61,4 +61,9 @@ export class HomeComponent implements OnInit {
   handleImageError(event: any): void {
     event.target.src = 'assets/placeholder.jpg';
   }
+
+
+  getStarsArray(count: number): number[] {
+    return Array(Math.max(0, Math.floor(count))).fill(0);
+  }
 }

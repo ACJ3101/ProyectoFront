@@ -85,4 +85,8 @@ export class HomeProductComponent implements OnInit {
       this.toastService.show(`Se añadió ${producto.cantidad} ${producto.cantidad === 1 ? 'unidad' : 'unidades'} de ${producto.nombre} al carrito`, 'success');
     }
   }
+
+  getStarsArray(count: number): number[] {
+    return Array(Math.max(0, Math.floor(count))).fill(0);
+  }
 }
