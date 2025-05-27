@@ -11,18 +11,17 @@ import { environment } from '../../../../environments/environment';
   providedIn: 'root'
 })
 export class HttpService {
-  private baseUrl: string;
+  private baseUrl: string = 'https://proyectointegradoback-production.up.railway.app/api';
 
   constructor(
     private http: HttpClient,
     @Inject(PLATFORM_ID) private platformId: Object
   ) {
-    this.baseUrl = environment.apiUrl;
-
-    // Asegurarse de que siempre usamos la URL de producción en el servidor
-    if (isPlatformServer(this.platformId)) {
-      this.baseUrl = 'https://proyectointegradoback-production.up.railway.app/api';
-    }
+    // Forzar siempre la URL de producción
+    console.log('Environment API URL:', environment.apiUrl);
+    console.log('Using base URL:', this.baseUrl);
+    console.log('Is Server:', isPlatformServer(this.platformId));
+    console.log('Is Production:', environment.production);
   }
 
   // ----------------------------
