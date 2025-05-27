@@ -1,6 +1,7 @@
-import { Injectable } from '@angular/core';
+import { Injectable, Inject, PLATFORM_ID } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { isPlatformBrowser, isPlatformServer } from '@angular/common';
 
 import { Producto, Usuario, Categoria, Comentario, Publicacion, PublicacionRequest } from '../../models/interfaces';
 
@@ -10,11 +11,19 @@ import { environment } from '../../../../environments/environment';
   providedIn: 'root'
 })
 export class HttpService {
+  private baseUrl: string;
 
-  private baseUrl = environment.apiUrl;
+  constructor(
+    private http: HttpClient,
+    @Inject(PLATFORM_ID) private platformId: Object
+  ) {
+    this.baseUrl = environment.apiUrl;
 
-
-  constructor(private http: HttpClient) { }
+    // Asegurarse de que siempre usamos la URL de producción en el servidor
+    if (isPlatformServer(this.platformId)) {
+      this.baseUrl = 'https://proyectointegradoback-production.up.railway.app/api';
+    }
+  }
 
   // ----------------------------
   // 🔐 AUTENTICACIÓN
