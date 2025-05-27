@@ -1,7 +1,9 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+
 import { Producto, Usuario, Categoria, Comentario, Publicacion, PublicacionRequest } from '../../models/interfaces';
+
 import { environment } from '../../../../environments/environment';
 
 @Injectable({
@@ -10,6 +12,7 @@ import { environment } from '../../../../environments/environment';
 export class HttpService {
 
   private baseUrl = environment.apiUrl;
+
 
   constructor(private http: HttpClient) { }
 
