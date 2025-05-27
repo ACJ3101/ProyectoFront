@@ -64,8 +64,6 @@ export interface ComentarioProducto {
   producto: Producto;
 }
 
-
-
 export interface Comentario {
   id?: number;
   comentario: string;
@@ -79,11 +77,19 @@ export interface Publicacion {
   id?: number;
   titulo: string;
   contenido: string;
-  fecha: Date;
-  usuarioId: number;
-  usuarioNick: string;
+  categoria: string;
+  autorId: number;
+  autorNick?: string;
+  fecha?: Date;
   likes?: number;
   comentarios?: number;
+}
+
+export interface PublicacionRequest {
+  titulo: string;
+  contenido: string;
+  categoria: string;
+  autorId: number;
 }
 
 

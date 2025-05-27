@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { Producto, Usuario, Categoria, Comentario, Publicacion } from '../../models/interfaces';
+import { Producto, Usuario, Categoria, Comentario, Publicacion, PublicacionRequest } from '../../models/interfaces';
 import { environment } from '../../../../environments/environment';
 
 @Injectable({
@@ -136,24 +136,37 @@ export class HttpService {
     return this.http.delete<void>(`${this.baseUrl}/comentarios/${id}`);
   }
 
-  // Métodos para publicaciones
+  // Métodos para publicaciones del blog
   getPublicaciones(): Observable<Publicacion[]> {
-    return this.http.get<Publicacion[]>(`${this.baseUrl}/publicaciones`);
+    return this.http.get<Publicacion[]>(`${this.baseUrl}/api/publicaciones`);
   }
 
   getPublicacionPorId(id: number): Observable<Publicacion> {
-    return this.http.get<Publicacion>(`${this.baseUrl}/publicaciones/${id}`);
+    return this.http.get<Publicacion>(`${this.baseUrl}/api/publicaciones/${id}`);
   }
 
-  crearPublicacion(publicacion: Publicacion): Observable<Publicacion> {
-    return this.http.post<Publicacion>(`${this.baseUrl}/publicaciones`, publicacion);
-  }
-
-  actualizarPublicacion(id: number, publicacion: Publicacion): Observable<Publicacion> {
-    return this.http.put<Publicacion>(`${this.baseUrl}/publicaciones/${id}`, publicacion);
+  crearPublicacion(publicacion: PublicacionRequest): Observable<Publicacion> {
+    return this.http.post<Publicacion>(`${this.baseUrl}/api/publicaciones`, publicacion);
   }
 
   eliminarPublicacion(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.baseUrl}/publicaciones/${id}`);
+    return this.http.delete<void>(`${this.baseUrl}/api/publicaciones/${id}`);
+  }
+
+  // Métodos adicionales del blog que podrían necesitar actualización en el futuro
+  darLikePublicacion(publicacionId: number): Observable<void> {
+    return this.http.post<void>(`${this.baseUrl}/api/publicaciones/${publicacionId}/like`, {});
+  }
+
+  quitarLikePublicacion(publicacionId: number): Observable<void> {
+    return this.http.delete<void>(`${this.baseUrl}/api/publicaciones/${publicacionId}/like`);
+  }
+
+  getComentariosPublicacion(publicacionId: number): Observable<Comentario[]> {
+    return this.http.get<Comentario[]>(`${this.baseUrl}/api/publicaciones/${publicacionId}/comentarios`);
+  }
+
+  comentarPublicacion(publicacionId: number, comentario: Comentario): Observable<Comentario> {
+    return this.http.post<Comentario>(`${this.baseUrl}/api/publicaciones/${publicacionId}/comentarios`, comentario);
   }
 }

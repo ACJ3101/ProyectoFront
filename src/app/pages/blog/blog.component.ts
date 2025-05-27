@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { HttpService } from '../../core/services/http/http.service';
-import { Publicacion, Usuario } from '../../core/models/interfaces';
+import { Publicacion, Usuario, PublicacionRequest } from '../../core/models/interfaces';
 import { StorageService } from '../../core/services/storageService/storage.service';
 import { FormsModule } from '@angular/forms';
 import { ToastService } from '../../core/services/toast/toast.service';
@@ -24,12 +24,11 @@ export class BlogComponent implements OnInit {
   error: string | null = null;
 
   // Variables para el modal
-  nuevaPublicacion: Publicacion = {
+  nuevaPublicacion: PublicacionRequest = {
     titulo: '',
     contenido: '',
-    fecha: new Date(),
-    usuarioId: 0,
-    usuarioNick: ''
+    categoria: 'General',
+    autorId: 0
   };
   guardando: boolean = false;
 
@@ -73,7 +72,7 @@ export class BlogComponent implements OnInit {
   }
 
   puedeEditar(publicacion: Publicacion): boolean {
-    return this.usuarioActual?.id === publicacion.usuarioId;
+    return this.usuarioActual?.id === publicacion.autorId;
   }
 
   prepararNuevaPublicacion(): void {
@@ -81,39 +80,53 @@ export class BlogComponent implements OnInit {
       this.nuevaPublicacion = {
         titulo: '',
         contenido: '',
-        fecha: new Date(),
-        usuarioId: this.usuarioActual.id!,
-        usuarioNick: this.usuarioActual.nick
+        categoria: 'General', // Categoría por defecto
+        autorId: this.usuarioActual.id!
       };
+    } else {
+      this.toastService.show('Debes iniciar sesión para crear una publicación', 'error');
     }
   }
 
-  guardarPublicacion(): void {
-    if (!this.nuevaPublicacion.titulo.trim() || !this.nuevaPublicacion.contenido.trim()) {
-      this.toastService.show('Por favor, completa todos los campos', 'error');
+  crearPublicacion(): void {
+    if (!this.usuarioActual) {
+      this.toastService.show('Debes iniciar sesión para crear una publicación', 'error');
       return;
     }
 
-    this.guardando = true;
-    this.http.crearPublicacion(this.nuevaPublicacion).subscribe({
-      next: () => {
-        this.toastService.show('Publicación creada exitosamente', 'success');
-        this.cargarPublicaciones();
-        this.guardando = false;
-        // Cerrar el modal
-        const modalElement = document.getElementById('crearPublicacionModal');
-        if (modalElement) {
-          const modal = bootstrap.Modal.getInstance(modalElement);
-          if (modal) {
-            modal.hide();
-          }
-        }
+    if (!this.nuevaPublicacion.titulo.trim() || !this.nuevaPublicacion.contenido.trim()) {
+      this.toastService.show('El título y el contenido son obligatorios', 'error');
+      return;
+    }
+
+    const publicacionRequest: PublicacionRequest = {
+      titulo: this.nuevaPublicacion.titulo.trim(),
+      contenido: this.nuevaPublicacion.contenido.trim(),
+      categoria: this.nuevaPublicacion.categoria,
+      autorId: this.usuarioActual.id!
+    };
+
+    this.http.crearPublicacion(publicacionRequest).subscribe({
+      next: (publicacion) => {
+        this.toastService.show('Publicación creada con éxito', 'success');
+        this.cargarPublicaciones(); // Recargar las publicaciones
+        this.cerrarModal(); // Cerrar el modal de nueva publicación
       },
       error: (error) => {
         console.error('Error al crear la publicación:', error);
         this.toastService.show('Error al crear la publicación', 'error');
-        this.guardando = false;
       }
     });
+  }
+
+  cerrarModal(): void {
+    // Cerrar el modal
+    const modalElement = document.getElementById('crearPublicacionModal');
+    if (modalElement) {
+      const modal = bootstrap.Modal.getInstance(modalElement);
+      if (modal) {
+        modal.hide();
+      }
+    }
   }
 }

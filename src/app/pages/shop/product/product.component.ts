@@ -174,9 +174,13 @@ export class ProductComponent implements OnInit {
       this.procesandoCarrito = true;
 
       try {
-        this.cartService.agregarProducto(this.producto, this.cantidad);
-        this.toastService.show(`Se añadió ${this.cantidad} ${this.cantidad === 1 ? 'unidad' : 'unidades'} al carrito`, 'success');
-        this.actualizarCantidadEnCarrito();
+        const agregadoExitoso = this.cartService.agregarProducto(this.producto, this.cantidad);
+        if (agregadoExitoso) {
+          this.toastService.show(`Se añadió ${this.cantidad} ${this.cantidad === 1 ? 'unidad' : 'unidades'} al carrito`, 'success');
+          this.actualizarCantidadEnCarrito();
+        } else {
+          this.toastService.show('No hay suficiente stock disponible', 'error');
+        }
       } catch (error) {
         this.toastService.show('Error al añadir al carrito', 'error');
       } finally {

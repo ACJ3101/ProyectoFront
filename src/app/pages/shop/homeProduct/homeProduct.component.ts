@@ -17,8 +17,8 @@ import { StorageService } from '../../../core/services/storageService/storage.se
   standalone: true
 })
 export class HomeProductComponent implements OnInit {
-  productos: (Producto & { cantidad: number })[] = [];
-  todosLosProductos: (Producto & { cantidad: number })[] = [];
+  productos: (Producto & { cantidad: number; procesandoCarrito?: boolean })[] = [];
+  todosLosProductos: (Producto & { cantidad: number; procesandoCarrito?: boolean })[] = [];
   categoriaSeleccionada: number | null = null;
   cargando: boolean = true;
   usuarioActual: Usuario | null = null;
@@ -33,6 +33,25 @@ export class HomeProductComponent implements OnInit {
   ngOnInit(): void {
     this.usuarioActual = this.storageService.obtenerUsuario();
     this.cargarProductos();
+
+    // Suscribirse a cambios en el carrito para actualizar cantidades disponibles
+    this.cartService.carrito$.subscribe(() => {
+      this.actualizarStockDisponible();
+    });
+  }
+
+  private actualizarStockDisponible(): void {
+    this.productos.forEach(producto => {
+      const cantidadEnCarrito = this.cartService.obtenerCantidadProducto(producto.id!);
+      if (producto.cantidad > (producto.stock - cantidadEnCarrito)) {
+        producto.cantidad = Math.max(1, producto.stock - cantidadEnCarrito);
+      }
+    });
+  }
+
+  getStockDisponible(producto: Producto): number {
+    const cantidadEnCarrito = this.cartService.obtenerCantidadProducto(producto.id!);
+    return producto.stock - cantidadEnCarrito;
   }
 
   cargarProductos(): void {
@@ -43,9 +62,11 @@ export class HomeProductComponent implements OnInit {
           .filter(producto => producto.publicado)
           .map(producto => ({
             ...producto,
-            cantidad: 1
+            cantidad: 1,
+            procesandoCarrito: false
           }));
         this.filtrarProductos();
+        this.actualizarStockDisponible();
         this.cargando = false;
       },
       error: (error) => {
@@ -72,7 +93,8 @@ export class HomeProductComponent implements OnInit {
   }
 
   incrementarCantidad(producto: Producto & { cantidad: number }): void {
-    if (producto.cantidad < producto.stock) {
+    const stockDisponible = this.getStockDisponible(producto);
+    if (producto.cantidad < stockDisponible) {
       producto.cantidad++;
     }
   }
@@ -83,10 +105,34 @@ export class HomeProductComponent implements OnInit {
     }
   }
 
-  agregarAlCarrito(producto: Producto & { cantidad: number }): void {
-    if (producto.cantidad > 0 && producto.cantidad <= producto.stock) {
-      this.cartService.agregarProducto(producto, producto.cantidad);
-      this.toastService.show(`Se añadió ${producto.cantidad} ${producto.cantidad === 1 ? 'unidad' : 'unidades'} de ${producto.nombre} al carrito`, 'success');
+  agregarAlCarrito(producto: Producto & { cantidad: number; procesandoCarrito?: boolean }): void {
+    if (producto.procesandoCarrito) {
+      return;
+    }
+
+    const stockDisponible = this.getStockDisponible(producto);
+    if (producto.cantidad > 0 && producto.cantidad <= stockDisponible) {
+      producto.procesandoCarrito = true;
+
+      try {
+        const agregadoExitoso = this.cartService.agregarProducto(producto, producto.cantidad);
+        if (agregadoExitoso) {
+          this.toastService.show(
+            `Se añadió ${producto.cantidad} ${producto.cantidad === 1 ? 'unidad' : 'unidades'} de ${producto.nombre} al carrito`,
+            'success'
+          );
+          producto.cantidad = 1;
+          this.actualizarStockDisponible();
+        } else {
+          this.toastService.show('No hay suficiente stock disponible', 'error');
+        }
+      } catch (error) {
+        this.toastService.show('Error al añadir al carrito', 'error');
+      } finally {
+        producto.procesandoCarrito = false;
+      }
+    } else {
+      this.toastService.show('No hay suficiente stock disponible', 'error');
     }
   }
 

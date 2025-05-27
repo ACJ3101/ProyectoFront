@@ -57,16 +57,16 @@
                 <p class="fw-bold text-primary mb-2">{{ producto.precio | currency:'EUR' }}</p>
 
                 <!-- Estado del stock -->
-                <p class="text-success small mb-2" *ngIf="producto.stock > 0">
-                  <i class="bi bi-check-circle-fill me-1"></i>Stock: {{ producto.stock }}
+                <p class="text-success small mb-2" *ngIf="getStockDisponible(producto) > 0">
+                  <i class="bi bi-check-circle-fill me-1"></i>Disponible: {{ getStockDisponible(producto) }}
                 </p>
-                <p class="text-danger small mb-2" *ngIf="producto.stock === 0">
-                  <i class="bi bi-x-circle-fill me-1"></i>Sin stock
+                <p class="text-danger small mb-2" *ngIf="getStockDisponible(producto) === 0">
+                  <i class="bi bi-x-circle-fill me-1"></i>Sin stock disponible
                 </p>
               </div>
 
               <!-- Mensaje para usuarios no registrados -->
-              <div *ngIf="!usuarioActual?.id && producto.stock > 0" class="mt-auto">
+              <div *ngIf="!usuarioActual?.id && getStockDisponible(producto) > 0" class="mt-auto">
                 <small class="text-muted d-block text-center">
                   <i class="bi bi-info-circle me-1"></i>
                   <a [routerLink]="['/auth/login']" class="text-decoration-none">Inicia sesión</a> para comprar
@@ -74,7 +74,7 @@
               </div>
 
               <!-- Controles de cantidad y carrito solo para usuarios registrados -->
-              <div *ngIf="usuarioActual?.id && producto.stock > 0" class="mt-auto">
+              <div *ngIf="usuarioActual?.id && getStockDisponible(producto) > 0" class="mt-auto">
                 <div class="input-group input-group-sm mb-2">
                   <button class="btn btn-outline-secondary btn-sm" type="button"
                           (click)="decrementarCantidad(producto)"
@@ -83,16 +83,19 @@
                   </button>
                   <input type="number" class="form-control form-control-sm text-center p-0"
                          [(ngModel)]="producto.cantidad"
-                         min="1" [max]="producto.stock">
+                         min="1" [max]="getStockDisponible(producto)"
+                         (ngModelChange)="producto.cantidad = $event > getStockDisponible(producto) ? getStockDisponible(producto) : ($event < 1 ? 1 : $event)">
                   <button class="btn btn-outline-secondary btn-sm" type="button"
                           (click)="incrementarCantidad(producto)"
-                          [disabled]="producto.cantidad >= producto.stock">
+                          [disabled]="producto.cantidad >= getStockDisponible(producto)">
                     <i class="bi bi-plus"></i>
                   </button>
                 </div>
                 <button class="btn btn-primary btn-sm w-100"
-                        (click)="agregarAlCarrito(producto)">
-                  <i class="bi bi-cart-plus me-1"></i>Añadir
+                        (click)="agregarAlCarrito(producto)"
+                        [disabled]="producto.procesandoCarrito || producto.cantidad > getStockDisponible(producto) || getStockDisponible(producto) === 0">
+                  <i class="bi" [ngClass]="producto.procesandoCarrito ? 'bi-hourglass-split' : 'bi-cart-plus'"></i>
+                  {{ producto.procesandoCarrito ? 'Añadiendo...' : 'Añadir' }}
                 </button>
               </div>
             </div>
