@@ -3,6 +3,7 @@ import { BehaviorSubject } from 'rxjs';
 import { Usuario } from '../../models/interfaces';
 import { AuthResponse } from '../../models/access-token';
 import { isPlatformBrowser } from '@angular/common';
+import { CartService } from '../cartService/cart.service';
 
 @Injectable({
   providedIn: 'root'
@@ -17,7 +18,10 @@ export class StorageService {
   private usuarioSubject = new BehaviorSubject<Usuario | null>(null);
   usuario$ = this.usuarioSubject.asObservable();
 
-  constructor(@Inject(PLATFORM_ID) private platformId: Object) {
+  constructor(
+    @Inject(PLATFORM_ID) private platformId: Object,
+    private cartService: CartService
+  ) {
     if (this.isBrowser()) {
       this.cargarUsuario();
     }
@@ -137,6 +141,7 @@ export class StorageService {
           localStorage.setItem(this.EMAIL_KEY, email);
         }
         this.usuarioSubject.next(null);
+        this.cartService.limpiarCarrito();
       } catch (error) {
         console.error('Error al eliminar usuario del localStorage:', error);
       }

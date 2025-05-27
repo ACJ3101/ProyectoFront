@@ -1,20 +1,88 @@
 <div class="container mt-4">
-  <h2 class="text-center mb-4">Foro de la Comunidad</h2>
+  <div class="row mb-4">
+    <div class="col">
+      <h2>Blog de CrochetManía</h2>
+      <p class="text-muted">Comparte tus experiencias y conocimientos sobre crochet</p>
+    </div>
+    <div class="col-auto" *ngIf="usuarioActual">
+      <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#crearPublicacionModal" (click)="prepararNuevaPublicacion()">
+        <i class="bi bi-plus-circle me-2"></i>Nueva Publicación
+      </button>
+    </div>
+  </div>
 
-  <p class="text-center text-muted mb-5">
-    Comparte tus experiencias, consejos o dudas con otros amantes del crochet.
-  </p>
+  <!-- Estado de carga -->
+  <div *ngIf="cargando" class="text-center py-5">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Cargando...</span>
+    </div>
+  </div>
 
-  <div class="list-group">
-    <div
-      class="list-group-item list-group-item-action flex-column align-items-start"
-      *ngFor="let post of publicaciones">
-      <div class="d-flex w-100 justify-content-between">
-        <h5 class="mb-1">{{ post.titulo }}</h5>
-        <small>{{ post.fechaPublicacion | date:'shortDate' }}</small>
+  <!-- Lista de publicaciones -->
+  <div *ngIf="!cargando" class="row g-4">
+    <div class="col-md-6" *ngFor="let publicacion of publicaciones">
+      <div class="card h-100 shadow-sm">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-start mb-2">
+            <h5 class="card-title mb-0">{{ publicacion.titulo }}</h5>
+            <span class="badge bg-secondary">{{ publicacion.categoria }}</span>
+          </div>
+          <p class="card-text">{{ publicacion.contenido }}</p>
+          <div class="d-flex justify-content-between align-items-center">
+            <small class="text-muted">
+              Por {{ publicacion.autorNick }} - {{ publicacion.fecha | date:'dd/MM/yyyy' }}
+            </small>
+            <div>
+              <button class="btn btn-sm btn-outline-primary me-2">
+                <i class="bi bi-heart me-1"></i>{{ publicacion.likes || 0 }}
+              </button>
+              <button class="btn btn-sm btn-outline-secondary">
+                <i class="bi bi-chat me-1"></i>{{ publicacion.comentarios || 0 }}
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
-      <p class="mb-1">{{ post.contenido | slice:0:100 }}...</p>
-      <small class="text-muted">Publicado por {{ post.autor.nombre }} {{ post.autor.apellidos }}</small>
+    </div>
+  </div>
+
+  <!-- Modal para crear nueva publicación -->
+  <div class="modal fade" id="crearPublicacionModal" tabindex="-1" aria-labelledby="crearPublicacionModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="crearPublicacionModalLabel">Nueva Publicación</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form>
+            <div class="mb-3">
+              <label for="titulo" class="form-label">Título</label>
+              <input type="text" class="form-control" id="titulo" [(ngModel)]="nuevaPublicacion.titulo" name="titulo" required>
+            </div>
+            <div class="mb-3">
+              <label for="categoria" class="form-label">Categoría</label>
+              <select class="form-select" id="categoria" [(ngModel)]="nuevaPublicacion.categoria" name="categoria">
+                <option value="General">General</option>
+                <option value="Tutoriales">Tutoriales</option>
+                <option value="Patrones">Patrones</option>
+                <option value="Consejos">Consejos</option>
+                <option value="Experiencias">Experiencias</option>
+              </select>
+            </div>
+            <div class="mb-3">
+              <label for="contenido" class="form-label">Contenido</label>
+              <textarea class="form-control" id="contenido" [(ngModel)]="nuevaPublicacion.contenido" name="contenido" rows="5" required></textarea>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+          <button type="button" class="btn btn-primary" (click)="crearPublicacion()">
+            Publicar
+          </button>
+        </div>
+      </div>
     </div>
   </div>
 </div>

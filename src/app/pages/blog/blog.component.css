@@ -1,0 +1,42 @@
+.card {
+  transition: transform 0.2s ease-in-out;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+}
+
+.card-title {
+  font-size: 1.25rem;
+  line-height: 1.4;
+}
+
+.card-title a:hover {
+  color: var(--bs-primary) !important;
+}
+
+.dropdown-toggle::after {
+  display: none;
+}
+
+.btn-link {
+  text-decoration: none;
+}
+
+.btn-link:hover {
+  color: var(--bs-primary) !important;
+}
+
+.card-text {
+  color: #6c757d;
+  line-height: 1.6;
+}
+
+.small {
+  font-size: 0.875rem;
+}
+
+.bi {
+  font-size: 1.1em;
+  vertical-align: -0.125em;
+}

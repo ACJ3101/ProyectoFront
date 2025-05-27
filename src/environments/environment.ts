@@ -1,4 +1,7 @@
 export const environment = {
   production: false,
-  apiUrl: 'https://proyectointegradoback-production.up.railway.app/api'
+
+  apiUrl: 'http://localhost:8080/api',
+  // apiUrl: 'https://proyectointegradoback-production.up.railway.app/api'
+
 };

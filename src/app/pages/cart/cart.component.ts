@@ -4,6 +4,7 @@ import { Producto } from '../../core/models/interfaces';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { ToastService } from '../../core/services/toast/toast.service';
 
 interface ProductoCarrito extends Producto {
   cantidad: number;
@@ -22,7 +23,8 @@ export class CartComponent implements OnInit {
 
   constructor(
     private cartService: CartService,
-    private router: Router
+    private router: Router,
+    private toastService: ToastService
   ) {}
 
   ngOnInit(): void {
@@ -37,15 +39,21 @@ export class CartComponent implements OnInit {
       ...item.producto,
       cantidad: item.cantidad
     }));
-    this.total = this.cartService.obtenerCantidadTotal();
+    this.total = this.cartService.obtenerTotal();
   }
 
   actualizarCantidad(productoId: number, cantidad: number): void {
-    this.cartService.actualizarCantidad(productoId, cantidad);
+    if (cantidad > 0) {
+      const actualizado = this.cartService.actualizarCantidad(productoId, cantidad);
+      if (!actualizado) {
+        this.toastService.show('No se puede actualizar la cantidad. Excede el stock disponible.', 'error');
+        this.actualizarCarrito(); // Recargar el carrito para mostrar las cantidades correctas
+      }
+    }
   }
 
-  eliminar(index: number): void {
-    this.cartService.eliminarProducto(index);
+  eliminar(productoId: number): void {
+    this.cartService.eliminarProducto(productoId);
   }
 
   vaciar(): void {
