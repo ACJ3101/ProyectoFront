@@ -1,4 +1,15 @@
-<div class="container my-5">
+<!-- Loading spinner -->
+<div class="container my-5" *ngIf="!producto">
+  <div class="text-center">
+    <div class="spinner-border" role="status">
+      <span class="visually-hidden">Cargando...</span>
+    </div>
+    <p class="mt-2">Cargando producto...</p>
+  </div>
+</div>
+
+<!-- Product content -->
+<div class="container my-5" *ngIf="producto">
   <div class="row">
     <div class="col-md-6">
       <img [src]="producto.imagenUrl" class="img-fluid rounded shadow-sm" alt="{{ producto.nombre }}" />
@@ -81,30 +92,61 @@
           Sin stock disponible
         </p>
 
-        <!-- Selector de cantidad -->
-        <div *ngIf="producto.stock > 0" class="d-flex align-items-center mb-3">
-          <label class="me-3">Cantidad:</label>
-          <div class="input-group" style="width: 150px;">
-            <button class="btn btn-outline-secondary" type="button" (click)="decrementarCantidad()"
-                    [disabled]="cantidad <= 1">
-              <i class="bi bi-dash"></i>
-            </button>
-            <input type="number" class="form-control text-center" [(ngModel)]="cantidad"
-                   min="1" [max]="producto.stock">
-            <button class="btn btn-outline-secondary" type="button" (click)="incrementarCantidad()"
-                    [disabled]="cantidad >= producto.stock">
-              <i class="bi bi-plus"></i>
-            </button>
-          </div>
+        <!-- Mensaje para usuarios no registrados -->
+        <div *ngIf="!usuarioActual?.id" class="alert alert-info">
+          <i class="bi bi-info-circle me-2"></i>
+          Debes <a [routerLink]="['/auth/login']" class="alert-link">iniciar sesión</a> para poder realizar compras.
         </div>
 
-        <!-- Botón de añadir al carrito -->
-        <button class="btn btn-primary w-100"
-                (click)="agregarAlCarrito()"
-                [disabled]="producto.stock === 0">
-          <i class="bi bi-cart-plus me-2"></i>
-          Añadir al carrito
-        </button>
+        <!-- Controles de compra solo para usuarios registrados -->
+        <ng-container *ngIf="usuarioActual">
+          <!-- Selector de cantidad -->
+          <div *ngIf="producto.stock > 0" class="d-flex align-items-center mb-3">
+            <label class="me-3">Cantidad:</label>
+            <div class="input-group" style="width: 150px;">
+              <button class="btn btn-outline-secondary" type="button" (click)="decrementarCantidad()"
+                      [disabled]="cantidad <= 1">
+                <i class="bi bi-dash"></i>
+              </button>
+              <input type="number" class="form-control text-center" [(ngModel)]="cantidad"
+                     min="1" [max]="producto.stock">
+              <button class="btn btn-outline-secondary" type="button" (click)="incrementarCantidad()"
+                      [disabled]="cantidad >= producto.stock">
+                <i class="bi bi-plus"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Botón de añadir al carrito -->
+          <button class="btn btn-primary w-100"
+                  (click)="agregarAlCarrito()"
+                  [disabled]="producto.stock === 0 ||
+                             procesandoCarrito ||
+                             (cantidadEnCarrito + cantidad) > producto.stock">
+            <span *ngIf="!procesandoCarrito">
+              <i class="bi bi-cart-plus me-2"></i>
+              Añadir al carrito
+            </span>
+            <span *ngIf="procesandoCarrito">
+              <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+              Añadiendo...
+            </span>
+          </button>
+
+          <!-- Advertencia de stock -->
+          <div *ngIf="cantidadEnCarrito > 0" class="alert alert-info mt-2">
+            <small>
+              <i class="bi bi-info-circle me-2"></i>
+              Ya tienes {{ cantidadEnCarrito }} unidad(es) en el carrito
+            </small>
+          </div>
+          <div *ngIf="(cantidadEnCarrito + cantidad) > producto.stock" class="alert alert-warning mt-2">
+            <small>
+              <i class="bi bi-exclamation-triangle me-2"></i>
+              No puedes añadir más unidades. Stock disponible: {{ producto.stock - cantidadEnCarrito }}
+            </small>
+          </div>
+        </ng-container>
       </div>
     </div>
   </div>
@@ -113,6 +155,12 @@
   <div class="row mt-5">
     <div class="col-12">
       <h3 class="mb-4">Comentarios y Calificaciones</h3>
+
+      <!-- Alerta para usuarios no registrados -->
+      <div class="alert alert-info" *ngIf="!usuarioActual">
+        <i class="bi bi-info-circle me-2"></i>
+        Debes iniciar sesión para poder dejar comentarios y calificaciones.
+      </div>
 
       <!-- Formulario para nuevo comentario -->
       <div class="card mb-4" *ngIf="usuarioActual">
@@ -163,6 +211,13 @@
                   <i class="bi bi-star" *ngFor="let star of [].constructor(5 - comentario.calificacion)"></i>
                 </div>
               </div>
+              <!-- Botón de eliminar -->
+              <button *ngIf="usuarioActual && (usuarioActual.id === comentario.usuarioId || usuarioActual.rol === 'ADMIN') && comentario.id"
+                      class="btn btn-outline-danger btn-sm"
+                      (click)="eliminarComentario(comentario.id)"
+                      title="Eliminar comentario">
+                <i class="bi bi-trash"></i>
+              </button>
             </div>
             <p class="card-text">{{ comentario.comentario }}</p>
           </div>

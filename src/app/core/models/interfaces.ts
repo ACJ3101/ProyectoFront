@@ -64,13 +64,7 @@ export interface ComentarioProducto {
   producto: Producto;
 }
 
-export interface PublicacionBlog {
-  id?: number;
-  titulo: string;
-  contenido: string;
-  fechaPublicacion: string;
-  autor: Usuario;
-}
+
 
 export interface Comentario {
   id?: number;
@@ -79,6 +73,17 @@ export interface Comentario {
   usuarioId: number;
   usuarioNick?: string;
   productoId: number;
+}
+
+export interface Publicacion {
+  id?: number;
+  titulo: string;
+  contenido: string;
+  fecha: Date;
+  usuarioId: number;
+  usuarioNick: string;
+  likes?: number;
+  comentarios?: number;
 }
 
 

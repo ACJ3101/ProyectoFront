@@ -1,15 +1,15 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { Producto, Usuario, Categoria, Comentario } from '../../models/interfaces';
+import { Producto, Usuario, Categoria, Comentario, Publicacion } from '../../models/interfaces';
+import { environment } from '../../../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class HttpService {
 
-  private baseUrl = 'http://localhost:8080/api';
-
+  private baseUrl = environment.apiUrl;
 
   constructor(private http: HttpClient) { }
 
@@ -134,5 +134,26 @@ export class HttpService {
 
   eliminarComentario(id: number): Observable<void> {
     return this.http.delete<void>(`${this.baseUrl}/comentarios/${id}`);
+  }
+
+  // Métodos para publicaciones
+  getPublicaciones(): Observable<Publicacion[]> {
+    return this.http.get<Publicacion[]>(`${this.baseUrl}/publicaciones`);
+  }
+
+  getPublicacionPorId(id: number): Observable<Publicacion> {
+    return this.http.get<Publicacion>(`${this.baseUrl}/publicaciones/${id}`);
+  }
+
+  crearPublicacion(publicacion: Publicacion): Observable<Publicacion> {
+    return this.http.post<Publicacion>(`${this.baseUrl}/publicaciones`, publicacion);
+  }
+
+  actualizarPublicacion(id: number, publicacion: Publicacion): Observable<Publicacion> {
+    return this.http.put<Publicacion>(`${this.baseUrl}/publicaciones/${id}`, publicacion);
+  }
+
+  eliminarPublicacion(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.baseUrl}/publicaciones/${id}`);
   }
 }

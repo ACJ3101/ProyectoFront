@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { Producto } from '../../../core/models/interfaces';
+import { Producto, Usuario } from '../../../core/models/interfaces';
 import { CommonModule } from '@angular/common';
 import { HttpService } from '../../../core/services/http/http.service';
 import { RouterModule } from '@angular/router';
@@ -7,6 +7,7 @@ import { CartService } from '../../../core/services/cartService/cart.service';
 import { ToastService } from '../../../core/services/toast/toast.service';
 import { FormsModule } from '@angular/forms';
 import { CategoryNavComponent } from '../category-nav/category-nav.component';
+import { StorageService } from '../../../core/services/storageService/storage.service';
 
 @Component({
   selector: 'app-homeProduct',
@@ -20,14 +21,17 @@ export class HomeProductComponent implements OnInit {
   todosLosProductos: (Producto & { cantidad: number })[] = [];
   categoriaSeleccionada: number | null = null;
   cargando: boolean = true;
+  usuarioActual: Usuario | null = null;
 
   constructor(
     private httpService: HttpService,
     private cartService: CartService,
-    private toastService: ToastService
+    private toastService: ToastService,
+    private storageService: StorageService
   ) {}
 
   ngOnInit(): void {
+    this.usuarioActual = this.storageService.obtenerUsuario();
     this.cargarProductos();
   }
 

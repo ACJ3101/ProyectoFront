@@ -37,15 +37,17 @@ export class CartComponent implements OnInit {
       ...item.producto,
       cantidad: item.cantidad
     }));
-    this.total = this.cartService.obtenerCantidadTotal();
+    this.total = this.cartService.obtenerTotal();
   }
 
   actualizarCantidad(productoId: number, cantidad: number): void {
-    this.cartService.actualizarCantidad(productoId, cantidad);
+    if (cantidad > 0) {
+      this.cartService.actualizarCantidad(productoId, cantidad);
+    }
   }
 
-  eliminar(index: number): void {
-    this.cartService.eliminarProducto(index);
+  eliminar(productoId: number): void {
+    this.cartService.eliminarProducto(productoId);
   }
 
   vaciar(): void {

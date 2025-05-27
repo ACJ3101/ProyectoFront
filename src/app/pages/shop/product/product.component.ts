@@ -25,6 +25,8 @@ export class ProductComponent implements OnInit {
   calificacion: number = 5;
   hoverCalificacion: number = 0;
   usuarioActual: Usuario | null = null;
+  procesandoCarrito: boolean = false;
+  cantidadEnCarrito: number = 0;
 
   constructor(
     private route: ActivatedRoute,
@@ -39,6 +41,13 @@ export class ProductComponent implements OnInit {
     const id = this.route.snapshot.params['id'];
     this.cargarProducto(id);
     this.cargarComentarios(id);
+    this.actualizarCantidadEnCarrito();
+  }
+
+  private actualizarCantidadEnCarrito(): void {
+    if (this.producto?.id) {
+      this.cantidadEnCarrito = this.cartService.obtenerCantidadProducto(this.producto.id);
+    }
   }
 
   cargarProducto(id: number): void {
@@ -158,9 +167,23 @@ export class ProductComponent implements OnInit {
   }
 
   agregarAlCarrito(): void {
-    if (this.cantidad > 0 && this.cantidad <= this.producto.stock) {
-      this.cartService.agregarProducto(this.producto, this.cantidad);
-      this.toastService.show(`Se añadió ${this.cantidad} ${this.cantidad === 1 ? 'unidad' : 'unidades'} al carrito`, 'success');
+    if (this.cantidad > 0 &&
+        this.cantidad <= this.producto.stock &&
+        (this.cantidadEnCarrito + this.cantidad) <= this.producto.stock) {
+
+      this.procesandoCarrito = true;
+
+      try {
+        this.cartService.agregarProducto(this.producto, this.cantidad);
+        this.toastService.show(`Se añadió ${this.cantidad} ${this.cantidad === 1 ? 'unidad' : 'unidades'} al carrito`, 'success');
+        this.actualizarCantidadEnCarrito();
+      } catch (error) {
+        this.toastService.show('Error al añadir al carrito', 'error');
+      } finally {
+        this.procesandoCarrito = false;
+      }
+    } else {
+      this.toastService.show('No hay suficiente stock disponible', 'error');
     }
   }
 }

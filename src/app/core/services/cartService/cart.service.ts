@@ -10,9 +10,11 @@ export class CartService {
   private carrito: { producto: Producto, cantidad: number }[] = [];
   private carritoSubject = new BehaviorSubject<{ producto: Producto, cantidad: number }[]>([]);
   private cantidadSubject = new BehaviorSubject<number>(0);
+  private totalSubject = new BehaviorSubject<number>(0);
 
   carrito$ = this.carritoSubject.asObservable();
   cantidad$ = this.cantidadSubject.asObservable();
+  total$ = this.totalSubject.asObservable();
 
   constructor(@Inject(PLATFORM_ID) private platformId: Object) {
     if (isPlatformBrowser(this.platformId)) {
@@ -27,6 +29,7 @@ export class CartService {
   private actualizarCarrito(): void {
     this.carritoSubject.next(this.carrito);
     this.cantidadSubject.next(this.calcularCantidadTotal());
+    this.totalSubject.next(this.calcularTotal());
     if (isPlatformBrowser(this.platformId)) {
       localStorage.setItem('carrito', JSON.stringify(this.carrito));
     }
@@ -34,6 +37,10 @@ export class CartService {
 
   private calcularCantidadTotal(): number {
     return this.carrito.reduce((total, item) => total + item.cantidad, 0);
+  }
+
+  private calcularTotal(): number {
+    return this.carrito.reduce((total, item) => total + (item.producto.precio * item.cantidad), 0);
   }
 
   agregarProducto(producto: Producto, cantidad: number): void {
@@ -58,7 +65,7 @@ export class CartService {
     if (item) {
       item.cantidad = cantidad;
       this.actualizarCarrito();
-  }
+    }
   }
 
   limpiarCarrito(): void {
@@ -70,7 +77,16 @@ export class CartService {
     return this.carrito;
   }
 
+  obtenerTotal(): number {
+    return this.calcularTotal();
+  }
+
   obtenerCantidadTotal(): number {
     return this.calcularCantidadTotal();
+  }
+
+  obtenerCantidadProducto(productoId: number): number {
+    const item = this.carrito.find(item => item.producto.id === productoId);
+    return item ? item.cantidad : 0;
   }
 }
