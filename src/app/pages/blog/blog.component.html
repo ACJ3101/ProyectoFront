@@ -4,10 +4,23 @@
       <h2>Blog de CrochetManía</h2>
       <p class="text-muted">Comparte tus experiencias y conocimientos sobre crochet</p>
     </div>
-    <div class="col-auto" *ngIf="usuarioActual">
-      <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#crearPublicacionModal" (click)="prepararNuevaPublicacion()">
+    <div class="col-auto">
+      <!-- Botón para usuarios autenticados -->
+      <button *ngIf="usuarioActual"
+              class="btn btn-primary"
+              data-bs-toggle="modal"
+              data-bs-target="#crearPublicacionModal"
+              (click)="prepararNuevaPublicacion()">
         <i class="bi bi-plus-circle me-2"></i>Nueva Publicación
       </button>
+
+      <!-- Mensaje para usuarios no autenticados -->
+      <div *ngIf="!usuarioActual" class="alert alert-info d-flex align-items-center" role="alert">
+        <i class="bi bi-info-circle me-2"></i>
+        <div>
+          <a routerLink="/auth/login" class="alert-link">Inicia sesión</a> para compartir tus publicaciones
+        </div>
+      </div>
     </div>
   </div>
 
@@ -21,7 +34,7 @@
   <!-- Lista de publicaciones -->
   <div *ngIf="!cargando" class="row g-4">
     <div class="col-md-6" *ngFor="let publicacion of publicaciones">
-      <div class="card h-100 shadow-sm">
+      <div class="card h-100 shadow-sm cursor-pointer" (click)="seleccionarPublicacion(publicacion)">
         <div class="card-body">
           <div class="d-flex justify-content-between align-items-start mb-2">
             <h5 class="card-title mb-0">{{ publicacion.titulo }}</h5>
@@ -30,16 +43,8 @@
           <p class="card-text">{{ publicacion.contenido }}</p>
           <div class="d-flex justify-content-between align-items-center">
             <small class="text-muted">
-              Por {{ publicacion.autorNick }} - {{ publicacion.fecha | date:'dd/MM/yyyy' }}
+              Por {{ publicacion.autor.nick }} - {{ publicacion.fecha | date:'dd/MM/yyyy' }}
             </small>
-            <div>
-              <button class="btn btn-sm btn-outline-primary me-2">
-                <i class="bi bi-heart me-1"></i>{{ publicacion.likes || 0 }}
-              </button>
-              <button class="btn btn-sm btn-outline-secondary">
-                <i class="bi bi-chat me-1"></i>{{ publicacion.comentarios || 0 }}
-              </button>
-            </div>
           </div>
         </div>
       </div>
@@ -81,6 +86,34 @@
           <button type="button" class="btn btn-primary" (click)="crearPublicacion()">
             Publicar
           </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal para ver comentarios -->
+  <div class="modal fade" id="verComentariosModal" tabindex="-1" aria-labelledby="verComentariosModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="verComentariosModalLabel">
+            Comentarios - {{ publicacionSeleccionada?.titulo }}
+          </h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="publicacion-contenido mb-4">
+            <p class="text-muted mb-2" *ngIf="publicacionSeleccionada">
+              Por {{ publicacionSeleccionada.autor.nick }} -
+              {{ formatearFecha(publicacionSeleccionada.fecha) }}
+            </p>
+            <p>{{ publicacionSeleccionada?.contenido }}</p>
+            <hr>
+          </div>
+          <app-comentarios
+            *ngIf="publicacionSeleccionada"
+            [publicacionId]="publicacionSeleccionada.id!">
+          </app-comentarios>
         </div>
       </div>
     </div>

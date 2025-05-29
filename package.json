@@ -7,9 +7,8 @@
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
+
     "start": "node dist/tienda-front/server/server.mjs"
-
-
 
   },
   "private": true,

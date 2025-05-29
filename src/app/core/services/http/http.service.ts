@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
-import { Producto, Usuario, Categoria, Comentario, Publicacion, PublicacionRequest } from '../../models/interfaces';
+import { Producto, Usuario, Categoria, Comentario, Publicacion, PublicacionRequest, ComentarioProducto, ComentarioBlog } from '../../models/interfaces';
 
 import { environment } from '../../../../environments/environment';
 
@@ -67,6 +67,10 @@ export class HttpService {
     return this.http.put(`${this.baseUrl}/usuarios/${datos.id}`, datos);
   }
 
+  eliminarUsuario(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.baseUrl}/usuarios/${id}`);
+  }
+
   cambiarContrasena(userId: number, nuevaContrasena: string): Observable<any> {
     return this.http.put(`${this.baseUrl}/usuarios/${userId}/cambiarContrasena`, {
       nuevaContrasena
@@ -127,16 +131,16 @@ export class HttpService {
   }
 
 
-  getComentariosPorProducto(productoId: number): Observable<Comentario[]> {
-    return this.http.get<Comentario[]>(`${this.baseUrl}/comentarios/producto/${productoId}`);
+  getComentariosPorProducto(productoId: number): Observable<ComentarioProducto[]> {
+    return this.http.get<ComentarioProducto[]>(`${this.baseUrl}/comentarios/producto/${productoId}`);
   }
 
-  crearComentario(comentario: Omit<Comentario, 'id' | 'usuarioNick'>): Observable<Comentario> {
-    return this.http.post<Comentario>(`${this.baseUrl}/comentarios`, comentario);
+  crearComentario(comentario: ComentarioProducto): Observable<ComentarioProducto> {
+    return this.http.post<ComentarioProducto>(`${this.baseUrl}/comentarios`, comentario);
   }
 
-  eliminarComentario(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.baseUrl}/comentarios/${id}`);
+  eliminarComentario(comentarioId: number): Observable<void> {
+    return this.http.delete<void>(`${this.baseUrl}/comentarios/${comentarioId}`);
   }
 
   // Métodos para publicaciones del blog
@@ -171,5 +175,13 @@ export class HttpService {
 
   comentarPublicacion(publicacionId: number, comentario: Comentario): Observable<Comentario> {
     return this.http.post<Comentario>(`${this.baseUrl}/publicaciones/${publicacionId}/comentarios`, comentario);
+  }
+
+  getComentariosBlog(publicacionId: number): Observable<ComentarioBlog[]> {
+    return this.http.get<ComentarioBlog[]>(`${this.baseUrl}/comentarios-blog/publicacion/${publicacionId}`);
+  }
+
+  crearComentarioBlog(comentario: ComentarioBlog): Observable<ComentarioBlog> {
+    return this.http.post<ComentarioBlog>(`${this.baseUrl}/comentarios-blog`, comentario);
   }
 }

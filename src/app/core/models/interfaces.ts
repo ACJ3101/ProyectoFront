@@ -58,10 +58,20 @@ export interface DetallePedido {
 
 export interface ComentarioProducto {
   id?: number;
-  texto: string;
-  fecha: string;
-  usuario: Usuario;
-  producto: Producto;
+  comentario: string;
+  calificacion: number;
+  usuarioId: number;
+  usuarioNick: string;
+  productoId: number;
+}
+
+export interface ComentarioBlog {
+  id?: number;
+  comentario: string;
+  calificacion: number;
+  usuarioNick: string;
+  publicacionId: number;
+  fecha?: string;
 }
 
 export interface Comentario {
@@ -69,20 +79,25 @@ export interface Comentario {
   comentario: string;
   calificacion: number;
   usuarioId: number;
-  usuarioNick?: string;
-  productoId: number;
+  fecha?: Date;
+  autor?: {
+    id: number;
+    nick: string;
+    nombre: string;
+  };
 }
 
 export interface Publicacion {
   id?: number;
   titulo: string;
   contenido: string;
+  fecha: string;
   categoria: string;
-  autorId: number;
-  autorNick?: string;
-  fecha?: Date;
-  likes?: number;
-  comentarios?: number;
+  autor: {
+    id: number;
+    nombre: string;
+    nick: string;
+  };
 }
 
 export interface PublicacionRequest {

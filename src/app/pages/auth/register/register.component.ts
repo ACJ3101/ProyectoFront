@@ -18,6 +18,8 @@ export class RegisterComponent implements OnInit {
 
   registroForm!: FormGroup;
   submitted = false;
+  usuarioExistente = false;
+
 
   constructor(
     private fb: FormBuilder,
@@ -72,37 +74,50 @@ export class RegisterComponent implements OnInit {
         }
       };
 
-      this.httpService.crearUsuario(nuevoUsuario).subscribe({
-        next: () => {
-          // 1. Hacer login automático
-          this.httpService.login(nuevoUsuario.email, nuevoUsuario.contraseña).subscribe({
-            next: (authResponse: AuthResponse) => {
-              // Primero guardamos los tokens
-              this.storageService.guardarToken(authResponse.accessToken);
-              this.storageService.guardarRefreshToken(authResponse.refreshToken);
+      //Comprobar si el usuario ya existe
+      this.httpService.getUsuarioPorEmail(nuevoUsuario.email).subscribe({
+        next: (usuario) => {
+          if (usuario) {
+            this.usuarioExistente = true;
+          }
+        },
+        error: () => {
+          this.usuarioExistente = false;
+          this.httpService.crearUsuario(nuevoUsuario).subscribe({
+            next: () => {
+              // 1. Hacer login automático
+              this.httpService.login(nuevoUsuario.email, nuevoUsuario.contraseña).subscribe({
+                next: (authResponse: AuthResponse) => {
+                  // Primero guardamos los tokens
+                  this.storageService.guardarToken(authResponse.accessToken);
+                  this.storageService.guardarRefreshToken(authResponse.refreshToken);
 
-              // Luego obtenemos y guardamos los datos del usuario
-              this.httpService.getUsuarioActual().subscribe({
-                next: (usuario) => {
-                  this.storageService.guardarUsuario(usuario);
+                  // Luego obtenemos y guardamos los datos del usuario
+                  this.httpService.getUsuarioActual().subscribe({
+                    next: (usuario) => {
+                      this.storageService.guardarUsuario(usuario);
 
-                  // 2. Limpiar formulario
-                  this.registroForm.reset();
-                  this.submitted = false;
+                      // 2. Limpiar formulario
+                      this.registroForm.reset();
+                      this.submitted = false;
 
-                  // 3. Redirigir a /home
-                  this.router.navigate(['/home']);
+                      // 3. Redirigir a /home
+                      this.router.navigate(['/home']);
+                    },
+                    error: () => {
+                      alert('Error al obtener los datos del usuario');
+                    }
+                  });
                 },
-                error: () => {
-                  alert('Error al obtener los datos del usuario');
-                }
+                error: () => alert('Error al iniciar sesión automáticamente')
               });
             },
-            error: () => alert('Error al iniciar sesión automáticamente')
+            error: () => alert('Error al registrar usuario')
           });
-        },
-        error: () => alert('Error al registrar usuario')
+        }
       });
+
+
     }
   }
 }

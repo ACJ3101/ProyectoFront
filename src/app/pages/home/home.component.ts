@@ -13,57 +13,43 @@ import { Producto } from '../../core/models/interfaces';
 })
 export class HomeComponent implements OnInit {
   productosDestacados: Producto[] = [];
-  todosLosProductos: Producto[] = [];
+  cargando: boolean = true;
+  error: boolean = false;
 
   constructor(
     private httpService: HttpService
   ) {}
 
   ngOnInit(): void {
-    this.cargarProductos();
+    this.cargarProductosDestacados();
   }
 
-  cargarProductos(): void {
+  cargarProductosDestacados(): void {
+    this.cargando = true;
+    this.error = false;
+
     this.httpService.getProductos().subscribe({
       next: (productos) => {
-        this.todosLosProductos = productos.filter(p => p.publicado);
-        this.actualizarProductosDestacados();
+        // Filtrar productos publicados y ordenar por calidad
+        this.productosDestacados = productos
+          .filter(p => p.publicado)
+          .sort((a, b) => (b.calidad || 0) - (a.calidad || 0))
+          .slice(0, 3); // Tomar los 3 mejores
+        this.cargando = false;
       },
       error: (error) => {
-        console.error('Error al cargar productos:', error);
+        console.error('Error al cargar productos destacados:', error);
+        this.error = true;
+        this.cargando = false;
       }
     });
   }
 
-  private actualizarProductosDestacados(): void {
-    if (this.todosLosProductos.length === 0) return;
-
-    // Filtrar productos que tienen calificación
-    const productosConCalificacion = this.todosLosProductos.filter(p => p.calidad !== null);
-
-    if (productosConCalificacion.length === 0) {
-      // Si no hay productos calificados, mostrar los 3 primeros productos disponibles
-      this.productosDestacados = this.todosLosProductos.slice(0, 3);
-      return;
-    }
-
-    // Ordenar productos por calificación de mayor a menor
-    const productosOrdenados = productosConCalificacion.sort((a, b) => {
-      if (b.calidad === null) return -1;
-      if (a.calidad === null) return 1;
-      return b.calidad - a.calidad;
-    });
-
-    // Tomar los 3 productos con mejor calificación
-    this.productosDestacados = productosOrdenados.slice(0, 3);
-  }
-
   handleImageError(event: any): void {
-    event.target.src = 'assets/placeholder.jpg';
+    event.target.src = '/assets/default-product.jpg';
   }
-
 
   getStarsArray(count: number): number[] {
-    return Array(Math.max(0, Math.floor(count))).fill(0);
+    return Array(Math.round(count)).fill(0);
   }
 }
