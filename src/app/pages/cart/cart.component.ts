@@ -47,7 +47,7 @@ export class CartComponent implements OnInit {
       const actualizado = this.cartService.actualizarCantidad(productoId, cantidad);
       if (!actualizado) {
         this.toastService.show('No se puede actualizar la cantidad. Excede el stock disponible.', 'error');
-        this.actualizarCarrito(); // Recargar el carrito para mostrar las cantidades correctas
+        this.actualizarCarrito();
       }
     }
   }
@@ -65,8 +65,18 @@ export class CartComponent implements OnInit {
   }
 
   finalizarCompra(): void {
-    // Aquí iría la lógica para finalizar la compra
-    alert('Funcionalidad de finalizar compra pendiente de implementar');
+    if (this.carrito.length === 0) {
+      this.toastService.show('El carrito está vacío', 'error');
+      return;
+    }
+
+    // Redirigir al checkout con los datos necesarios
+    this.router.navigate(['/checkout'], {
+      queryParams: {
+        total: this.total,
+        productos: JSON.stringify(this.carrito)
+      }
+    });
   }
 
   obtenerSubtotal(producto: ProductoCarrito): number {

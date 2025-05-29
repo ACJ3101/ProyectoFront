@@ -1,0 +1,86 @@
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-md-8">
+      <div class="card shadow-sm">
+        <div class="card-body p-4">
+          <h2 class="mb-4">Confirmar Pedido</h2>
+
+          <!-- Resumen de productos -->
+          <div class="mb-4">
+            <h5>Productos en tu pedido</h5>
+            <div class="table-responsive">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th>Producto</th>
+                    <th class="text-center">Cantidad</th>
+                    <th class="text-end">Precio</th>
+                    <th class="text-end">Subtotal</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let producto of productos">
+                    <td>
+                      <div class="d-flex align-items-center">
+                        <img [src]="producto.imagenUrl"
+                             class="img-thumbnail me-3"
+                             style="width: 48px; height: 48px; object-fit: cover;"
+                             [alt]="producto.nombre">
+                        <span>{{ producto.nombre }}</span>
+                      </div>
+                    </td>
+                    <td class="text-center">{{ producto.cantidad }}</td>
+                    <td class="text-end">{{ producto.precio | currency:'EUR' }}</td>
+                    <td class="text-end">{{ obtenerSubtotal(producto) | currency:'EUR' }}</td>
+                  </tr>
+                  <tr class="table-light">
+                    <td colspan="3" class="text-end fw-bold">Total:</td>
+                    <td class="text-end fw-bold">{{ total | currency:'EUR' }}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Información de pago -->
+          <div class="alert alert-info mb-4" role="alert">
+            <i class="bi bi-info-circle-fill me-2"></i>
+            Serás redirigido a nuestra plataforma segura de pagos para completar la transacción.
+          </div>
+
+          <!-- Botones de acción -->
+          <div class="d-grid gap-2">
+            <button
+              class="btn btn-primary btn-lg payment-button"
+              [disabled]="procesando"
+              (click)="iniciarPago()">
+              <span *ngIf="!procesando">
+                <i class="bi bi-credit-card me-2"></i>Proceder al Pago
+              </span>
+              <span *ngIf="procesando">
+                <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                Procesando...
+              </span>
+            </button>
+            <button
+              class="btn btn-outline-secondary"
+              [disabled]="procesando"
+              (click)="volverAlCarrito()">
+              <i class="bi bi-arrow-left me-2"></i>Volver al carrito
+            </button>
+          </div>
+
+          <!-- Métodos de pago aceptados -->
+          <div class="text-center mt-4">
+            <small class="text-muted">Métodos de pago aceptados</small>
+            <div class="payment-methods mt-2">
+              <i class="bi bi-credit-card-2-front mx-2"></i>
+              <i class="bi bi-credit-card mx-2"></i>
+              <i class="bi bi-wallet2 mx-2"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

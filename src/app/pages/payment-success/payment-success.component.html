@@ -1,0 +1,35 @@
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-md-8 text-center">
+      <div class="card border-0 shadow-sm">
+        <div class="card-body p-5">
+          <div class="mb-4">
+            <i class="bi bi-check-circle-fill text-success success-icon"></i>
+          </div>
+          <h2 class="mb-4">¡Pago Confirmado!</h2>
+          <p class="lead text-muted mb-4">
+            Tu pago ha sido procesado exitosamente. Gracias por tu compra.
+          </p>
+          <div class="order-info mb-4">
+            <div class="order-number">
+              <small class="text-muted">Número de orden:</small>
+              <p class="mb-0 fw-bold">#{{ orderId || '000000' }}</p>
+            </div>
+            <div class="order-date">
+              <small class="text-muted">Fecha:</small>
+              <p class="mb-0">{{ currentDate | date:'dd/MM/yyyy HH:mm' }}</p>
+            </div>
+          </div>
+          <div class="d-grid gap-3 d-sm-flex justify-content-sm-center">
+            <a routerLink="/shop" class="btn btn-outline-primary btn-lg">
+              <i class="bi bi-shop me-2"></i>Seguir comprando
+            </a>
+            <a routerLink="/profile" class="btn btn-primary btn-lg">
+              <i class="bi bi-box me-2"></i>Ver mis pedidos
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

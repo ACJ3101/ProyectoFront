@@ -1,0 +1,49 @@
+:host {
+  display: block;
+  min-height: 100vh;
+  background-color: #f8f9fa;
+}
+
+.card {
+  border-radius: 1rem;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 1rem 3rem rgba(0,0,0,.175)!important;
+}
+
+.success-icon {
+  font-size: 4rem;
+  animation: scaleIn 0.5s ease-out;
+}
+
+.order-info {
+  background-color: rgba(25, 135, 84, 0.1);
+  border-radius: 0.5rem;
+  padding: 1rem;
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+}
+
+.btn {
+  transition: all 0.3s ease;
+  padding: 0.75rem 1.5rem;
+}
+
+.btn:hover {
+  transform: translateY(-2px);
+}
+
+@keyframes scaleIn {
+  from {
+    transform: scale(0);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
