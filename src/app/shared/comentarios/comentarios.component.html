@@ -13,6 +13,14 @@
     {{ error }}
   </div>
 
+  <!-- Mensaje para usuarios no autenticados -->
+  <div *ngIf="!usuarioActual" class="alert alert-info d-flex align-items-center mb-4" role="alert">
+    <i class="bi bi-info-circle me-2"></i>
+    <div>
+      <a routerLink="/auth/login" class="alert-link">Inicia sesión</a> para participar en la conversación
+    </div>
+  </div>
+
   <!-- Formulario para nuevo comentario -->
   <div class="nuevo-comentario mb-4" *ngIf="usuarioActual">
     <div class="card">
@@ -26,7 +34,7 @@
           class="btn btn-primary mt-2"
           (click)="enviarComentario()"
           [disabled]="!nuevoComentario.trim()">
-          Publicar
+          <i class="bi bi-send me-2"></i>Publicar
         </button>
       </div>
     </div>
@@ -39,13 +47,20 @@
     </div>
 
     <div class="comentario mb-3" *ngFor="let comentario of comentarios">
-      <div class="d-flex justify-content-between align-items-start mb-2">
-        <div>
-          <span class="text-primary fw-bold">{{ comentario.usuarioNick }}</span>
+      <div class="card shadow-sm border-0 bg-light">
+        <div class="card-body">
+          <div class="d-flex align-items-center mb-2">
+            <div class="avatar me-2">
+              <i class="bi bi-person-circle fs-4 text-primary"></i>
+            </div>
+            <div>
+              <h6 class="mb-0 fw-bold text-primary">usuario: {{ comentario.usuarioNick }}</h6>
+              <small class="text-muted">fecha: {{ comentario.fecha | date:'dd/MM/yyyy HH:mm' }}</small>
+            </div>
+          </div>
+          <p class="card-text mb-0 ps-5 py-2">{{ comentario.comentario }}</p>
         </div>
       </div>
-      <p class="mb-0">{{ comentario.comentario }}</p>
-      <hr>
     </div>
   </div>
 </div>

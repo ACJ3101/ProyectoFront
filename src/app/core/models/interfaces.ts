@@ -66,10 +66,12 @@ export interface ComentarioProducto {
 }
 
 export interface ComentarioBlog {
+  id?: number;
   comentario: string;
   calificacion: number;
   usuarioNick: string;
   publicacionId: number;
+  fecha?: string;
 }
 
 export interface Comentario {

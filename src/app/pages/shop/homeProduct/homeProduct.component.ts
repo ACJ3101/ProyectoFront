@@ -73,7 +73,10 @@ export class HomeProductComponent implements OnInit {
         console.error('Error al cargar productos:', error);
         this.toastService.show('Error al cargar los productos', 'error');
         this.cargando = false;
-      }
+      },
+      complete: () => {
+        this.cargando = false;
+      },
     });
   }
 

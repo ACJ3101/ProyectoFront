@@ -4,10 +4,23 @@
       <h2>Blog de CrochetManía</h2>
       <p class="text-muted">Comparte tus experiencias y conocimientos sobre crochet</p>
     </div>
-    <div class="col-auto" *ngIf="usuarioActual">
-      <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#crearPublicacionModal" (click)="prepararNuevaPublicacion()">
+    <div class="col-auto">
+      <!-- Botón para usuarios autenticados -->
+      <button *ngIf="usuarioActual"
+              class="btn btn-primary"
+              data-bs-toggle="modal"
+              data-bs-target="#crearPublicacionModal"
+              (click)="prepararNuevaPublicacion()">
         <i class="bi bi-plus-circle me-2"></i>Nueva Publicación
       </button>
+
+      <!-- Mensaje para usuarios no autenticados -->
+      <div *ngIf="!usuarioActual" class="alert alert-info d-flex align-items-center" role="alert">
+        <i class="bi bi-info-circle me-2"></i>
+        <div>
+          <a routerLink="/auth/login" class="alert-link">Inicia sesión</a> para compartir tus publicaciones
+        </div>
+      </div>
     </div>
   </div>
 
