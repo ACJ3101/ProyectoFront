@@ -1,0 +1,27 @@
+.comentarios-container {
+  padding: 1rem;
+}
+
+.nuevo-comentario textarea {
+  resize: vertical;
+  min-height: 100px;
+}
+
+.comentarios-lista {
+  max-height: 500px;
+  overflow-y: auto;
+}
+
+.card {
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.card:hover {
+  box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+  transition: box-shadow 0.3s ease;
+}
+
+.text-muted {
+  font-size: 0.9rem;
+}

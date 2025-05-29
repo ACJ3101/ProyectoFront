@@ -3,7 +3,8 @@
 }
 
 .card:hover {
-  transform: translateY(-5px);
+  transform: translateY(-2px);
+  transition: transform 0.2s ease;
 }
 
 .card-title {
@@ -39,4 +40,8 @@
 .bi {
   font-size: 1.1em;
   vertical-align: -0.125em;
+}
+
+.cursor-pointer {
+  cursor: pointer;
 }

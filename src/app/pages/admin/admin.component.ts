@@ -5,6 +5,8 @@ import { HttpService } from '../../core/services/http/http.service';
 import { ToastService } from '../../core/services/toast/toast.service';
 import { Usuario, ROLES, Producto, Categoria } from '../../core/models/interfaces';
 
+declare var bootstrap: any;
+
 @Component({
   selector: 'app-admin',
   standalone: true,
@@ -31,6 +33,9 @@ export class AdminComponent implements OnInit {
   activeTab = 'usuarios';
 
   categorias: Categoria[] = [];
+
+  usuarioAEliminar: Usuario | null = null;
+  eliminandoUsuario = false;
 
   constructor(
     private httpService: HttpService,
@@ -240,6 +245,37 @@ export class AdminComponent implements OnInit {
       error: (error) => {
         console.error('Error al cargar categorías:', error);
         this.toastService.show('Error al cargar las categorías', 'error');
+      }
+    });
+  }
+
+  eliminarUsuario(usuario: Usuario): void {
+    if (usuario.rol?.nombre === 'ADMIN') {
+      this.toastService.show('No se puede eliminar un usuario administrador', 'error');
+      return;
+    }
+    this.usuarioAEliminar = usuario;
+  }
+
+  cancelarEliminacion(): void {
+    this.usuarioAEliminar = null;
+    this.eliminandoUsuario = false;
+  }
+
+  confirmarEliminacion(): void {
+    if (!this.usuarioAEliminar) return;
+
+    this.eliminandoUsuario = true;
+    this.httpService.eliminarUsuario(this.usuarioAEliminar.id!).subscribe({
+      next: () => {
+        this.toastService.show('Usuario eliminado correctamente', 'success');
+        this.cargarUsuarios();
+        this.cancelarEliminacion();
+      },
+      error: (error) => {
+        console.error('Error al eliminar el usuario:', error);
+        this.toastService.show('Error al eliminar el usuario', 'error');
+        this.eliminandoUsuario = false;
       }
     });
   }

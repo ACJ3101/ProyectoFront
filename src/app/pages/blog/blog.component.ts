@@ -7,13 +7,14 @@ import { StorageService } from '../../core/services/storageService/storage.servi
 import { FormsModule } from '@angular/forms';
 import { ToastService } from '../../core/services/toast/toast.service';
 import { ToastComponent } from '../../shared/toast/toast.component';
+import { ComentariosComponent } from '../../shared/comentarios/comentarios.component';
 
 declare var bootstrap: any;
 
 @Component({
   selector: 'app-blog',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule, ToastComponent],
+  imports: [CommonModule, RouterModule, FormsModule, ToastComponent, ComentariosComponent],
   templateUrl: './blog.component.html',
   styleUrls: ['./blog.component.css']
 })
@@ -22,15 +23,14 @@ export class BlogComponent implements OnInit {
   usuarioActual: Usuario | null = null;
   cargando: boolean = true;
   error: string | null = null;
+  publicacionSeleccionada: Publicacion | null = null;
 
-  // Variables para el modal
   nuevaPublicacion: PublicacionRequest = {
     titulo: '',
     contenido: '',
     categoria: 'General',
     autorId: 0
   };
-  guardando: boolean = false;
 
   constructor(
     private http: HttpService,
@@ -61,7 +61,7 @@ export class BlogComponent implements OnInit {
     });
   }
 
-  formatearFecha(fecha: Date): string {
+  formatearFecha(fecha: string): string {
     return new Date(fecha).toLocaleDateString('es-ES', {
       year: 'numeric',
       month: 'long',
@@ -72,7 +72,7 @@ export class BlogComponent implements OnInit {
   }
 
   puedeEditar(publicacion: Publicacion): boolean {
-    return this.usuarioActual?.id === publicacion.autorId;
+    return this.usuarioActual?.id === publicacion.autor.id;
   }
 
   prepararNuevaPublicacion(): void {
@@ -80,7 +80,7 @@ export class BlogComponent implements OnInit {
       this.nuevaPublicacion = {
         titulo: '',
         contenido: '',
-        categoria: 'General', // Categoría por defecto
+        categoria: 'General',
         autorId: this.usuarioActual.id!
       };
     } else {
@@ -107,10 +107,10 @@ export class BlogComponent implements OnInit {
     };
 
     this.http.crearPublicacion(publicacionRequest).subscribe({
-      next: (publicacion) => {
+      next: () => {
         this.toastService.show('Publicación creada con éxito', 'success');
-        this.cargarPublicaciones(); // Recargar las publicaciones
-        this.cerrarModal(); // Cerrar el modal de nueva publicación
+        this.cargarPublicaciones();
+        this.cerrarModal();
       },
       error: (error) => {
         console.error('Error al crear la publicación:', error);
@@ -120,13 +120,21 @@ export class BlogComponent implements OnInit {
   }
 
   cerrarModal(): void {
-    // Cerrar el modal
     const modalElement = document.getElementById('crearPublicacionModal');
     if (modalElement) {
       const modal = bootstrap.Modal.getInstance(modalElement);
       if (modal) {
         modal.hide();
       }
+    }
+  }
+
+  seleccionarPublicacion(publicacion: Publicacion): void {
+    this.publicacionSeleccionada = publicacion;
+    const modalElement = document.getElementById('verComentariosModal');
+    if (modalElement) {
+      const modal = new bootstrap.Modal(modalElement);
+      modal.show();
     }
   }
 }

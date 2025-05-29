@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { HttpService } from '../../../core/services/http/http.service';
 import { ActivatedRoute, RouterModule } from '@angular/router';
-import { Producto, Usuario, Comentario } from '../../../core/models/interfaces';
+import { Producto, Usuario, ComentarioProducto } from '../../../core/models/interfaces';
 import { CommonModule } from '@angular/common';
 import { CartService } from '../../../core/services/cartService/cart.service';
 import { FormsModule } from '@angular/forms';
@@ -20,7 +20,7 @@ export class ProductComponent implements OnInit {
   producto!: Producto;
   vendedor: Usuario | null = null;
   cantidad: number = 1;
-  comentarios: Comentario[] = [];
+  comentarios: ComentarioProducto[] = [];
   nuevoComentario: string = '';
   calificacion: number = 5;
   hoverCalificacion: number = 0;
@@ -106,7 +106,7 @@ export class ProductComponent implements OnInit {
       return;
     }
 
-    const comentario: Comentario = {
+    const comentario: ComentarioProducto = {
       comentario: this.nuevoComentario.trim(),
       calificacion: this.calificacion,
       usuarioId: this.usuarioActual.id!,
@@ -120,7 +120,7 @@ export class ProductComponent implements OnInit {
         this.nuevoComentario = '';
         this.calificacion = 5;
         this.cargarComentarios(this.producto.id!);
-        },
+      },
       error: (error: unknown) => {
         console.error('Error al publicar el comentario:', error);
         this.toastService.show('Error al publicar el comentario', 'error');
@@ -145,7 +145,7 @@ export class ProductComponent implements OnInit {
     });
   }
 
-  puedeEliminarComentario(comentario: Comentario): boolean {
+  puedeEliminarComentario(comentario: ComentarioProducto): boolean {
     return this.usuarioActual?.id === comentario.usuarioId;
   }
 
