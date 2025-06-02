@@ -6,8 +6,8 @@ import {
   HttpInterceptor,
   HttpErrorResponse
 } from '@angular/common/http';
-import { Observable, throwError, BehaviorSubject, of, lastValueFrom } from 'rxjs';
-import { catchError, filter, take, switchMap, finalize, delay } from 'rxjs/operators';
+import { Observable, throwError, BehaviorSubject } from 'rxjs';
+import { catchError, switchMap, finalize } from 'rxjs/operators';
 import { StorageService } from '../services/storageService/storage.service';
 import { HttpService } from '../services/http/http.service';
 import { AuthResponse } from '../models/access-token';
@@ -18,7 +18,6 @@ import { Router } from '@angular/router';
 export class AuthInterceptor implements HttpInterceptor {
   private isRefreshing = false;
   private refreshTokenSubject: BehaviorSubject<string | null> = new BehaviorSubject<string | null>(null);
-  private refreshTokenPromise: Promise<string | null> | null = null;
 
   constructor(
     private storageService: StorageService,
@@ -39,16 +38,15 @@ export class AuthInterceptor implements HttpInterceptor {
     }
 
     const token = this.storageService.obtenerToken();
-
     if (token) {
       request = this.addToken(request, token);
     }
 
     return next.handle(request).pipe(
-      catchError((error) => {
+      catchError(error => {
         if (error instanceof HttpErrorResponse &&
-           (error.status === 401 || error.status === 403) &&
-           !this.isAuthUrl(request.url)) {
+            (error.status === 401 || error.status === 403) &&
+            !this.isAuthUrl(request.url)) {
           return this.handle401Error(request, next);
         }
         return throwError(() => error);
@@ -68,67 +66,54 @@ export class AuthInterceptor implements HttpInterceptor {
     return url.includes('/auth/login') || url.includes('/auth/refresh');
   }
 
-  private async handle401Error(request: HttpRequest<any>, next: HttpHandler): Promise<HttpEvent<any>> {
-    if (!this.refreshTokenPromise) {
-      this.refreshTokenPromise = this.refreshToken();
-    }
+  private handle401Error(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
+    if (!this.isRefreshing) {
+      this.isRefreshing = true;
+      this.refreshTokenSubject.next(null);
 
-    try {
-      const newToken = await this.refreshTokenPromise;
-      this.refreshTokenPromise = null;
-
-      if (!newToken) {
+      const refreshToken = this.storageService.obtenerRefreshToken();
+      if (!refreshToken) {
         this.handleLogout();
-        throw new Error('No se pudo refrescar el token');
+        return throwError(() => new Error('No refresh token available'));
       }
 
-      return await lastValueFrom(next.handle(this.addToken(request, newToken)));
-    } catch (error) {
-      this.refreshTokenPromise = null;
-      this.handleLogout();
-      throw error;
-    }
-  }
+      return this.httpService.refreshToken(refreshToken).pipe(
+        switchMap((response: AuthResponse) => {
+          this.isRefreshing = false;
+          this.refreshTokenSubject.next(response.accessToken);
 
-  private refreshToken(): Promise<string | null> {
-    if (this.isRefreshing) {
-      return Promise.resolve(null);
-    }
+          // Guardar los nuevos tokens
+          this.storageService.guardarToken(response.accessToken);
+          this.storageService.guardarRefreshToken(response.refreshToken);
 
-    this.isRefreshing = true;
-    this.refreshTokenSubject.next(null);
-
-    const refreshToken = this.storageService.obtenerRefreshToken();
-    if (!refreshToken) {
-      this.isRefreshing = false;
-      return Promise.resolve(null);
-    }
-
-    return new Promise((resolve, reject) => {
-      this.httpService.refreshToken(refreshToken).pipe(
-        delay(1000), // Añadimos un pequeño delay para evitar llamadas muy rápidas
+          // Reintentamos la petición original con el nuevo token
+          return next.handle(this.addToken(request, response.accessToken));
+        }),
+        catchError(error => {
+          this.isRefreshing = false;
+          if (error.status === 401 || error.status === 403) {
+            this.handleLogout();
+          }
+          return throwError(() => error);
+        }),
         finalize(() => {
           this.isRefreshing = false;
         })
-      ).subscribe({
-        next: (response: AuthResponse) => {
-          this.storageService.guardarToken(response.accessToken);
-          this.storageService.guardarRefreshToken(response.refreshToken);
-          this.refreshTokenSubject.next(response.accessToken);
-          resolve(response.accessToken);
-        },
-        error: (error) => {
-          this.refreshTokenSubject.next(null);
-          reject(error);
+      );
+    }
+
+    // Si ya hay un refresh en curso, esperamos a que termine y reintentamos con el nuevo token
+    return this.refreshTokenSubject.pipe(
+      switchMap(token => {
+        if (token) {
+          return next.handle(this.addToken(request, token));
         }
-      });
-    });
+        return throwError(() => new Error('No token available'));
+      })
+    );
   }
 
   private handleLogout(): void {
-    this.isRefreshing = false;
-    this.refreshTokenSubject.next(null);
-    this.refreshTokenPromise = null;
     this.storageService.limpiarStorage();
     this.router.navigate(['/auth/login']);
   }

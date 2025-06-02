@@ -1,6 +1,9 @@
 import { Routes } from "@angular/router";
 import { adminGuard } from "../core/guards/admin.guard";
 import { profileGuard } from "../core/guards/profile.guard";
+import { PaymentSuccessComponent } from "./payment-success/payment-success.component";
+import { PaymentFailedComponent } from "./payment-failed/payment-failed.component";
+import { CheckoutComponent } from "./checkout/checkout.component";
 
 
 export const PAGES_ROUTES: Routes = [
@@ -40,9 +43,27 @@ export const PAGES_ROUTES: Routes = [
         canActivate: [profileGuard]
       },
       {
+        path: 'my-orders',
+        loadComponent: () => import('./my-orders/my-orders.component').then(m => m.MyOrdersComponent),
+        canActivate: [profileGuard],
+        title: 'Mis Pedidos'
+      },
+      {
         path: 'admin',
         loadComponent: () => import('./admin/admin.component').then(m => m.AdminComponent),
         canActivate: [adminGuard]
+      },{
+        path: 'payment-success',
+        component: PaymentSuccessComponent
+      },
+      {
+        path: 'payment-failed',
+        component: PaymentFailedComponent
+      },
+      {
+        path: 'checkout',
+        component: CheckoutComponent,
+        title: 'Checkout'
       },
       {
         path: '**',

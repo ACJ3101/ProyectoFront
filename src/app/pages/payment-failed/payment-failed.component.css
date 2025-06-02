@@ -1,0 +1,47 @@
+:host {
+  display: block;
+  min-height: 100vh;
+  background-color: #f8f9fa;
+}
+
+.card {
+  border-radius: 1rem;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 1rem 3rem rgba(0,0,0,.175)!important;
+}
+
+.error-icon {
+  font-size: 4rem;
+  animation: shake 0.5s ease-in-out;
+}
+
+.error-details {
+  background-color: rgba(220, 53, 69, 0.1);
+  border-radius: 0.5rem;
+  padding: 1rem;
+}
+
+.alert {
+  border-radius: 0.5rem;
+  border: none;
+  background-color: rgba(13, 202, 240, 0.1);
+}
+
+.btn {
+  transition: all 0.3s ease;
+  padding: 0.75rem 1.5rem;
+}
+
+.btn:hover {
+  transform: translateY(-2px);
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-10px); }
+  75% { transform: translateX(10px); }
+}

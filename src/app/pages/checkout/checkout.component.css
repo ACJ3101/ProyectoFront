@@ -1,0 +1,81 @@
+.card {
+  border-radius: 1rem;
+  border: none;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+}
+
+.table {
+  margin-bottom: 0;
+}
+
+.table td, .table th {
+  padding: 1rem;
+  vertical-align: middle;
+}
+
+.table th {
+  font-weight: 500;
+  color: #6c757d;
+}
+
+.payment-button {
+  padding: 1rem 2rem;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.payment-button:not(:disabled):hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+}
+
+.payment-button:disabled {
+  cursor: not-allowed;
+}
+
+.alert {
+  border: none;
+  border-radius: 0.5rem;
+}
+
+.payment-methods {
+  font-size: 1.5rem;
+  color: #6c757d;
+}
+
+.payment-methods i {
+  transition: color 0.3s ease;
+}
+
+.payment-methods i:hover {
+  color: #0d6efd;
+}
+
+/* Animación para el spinner */
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.spinner-border {
+  animation: spin 1s linear infinite;
+}
+
+/* Responsive adjustments */
+@media (max-width: 576px) {
+  .card-body {
+    padding: 1.5rem;
+  }
+
+  .table td, .table th {
+    padding: 0.75rem;
+  }
+
+  .payment-button {
+    padding: 0.75rem 1.5rem;
+  }
+}

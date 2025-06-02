@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
-import { Producto, Usuario, Categoria, Comentario, Publicacion, PublicacionRequest, ComentarioProducto, ComentarioBlog } from '../../models/interfaces';
+import { Producto, Usuario, Categoria, Comentario, Publicacion, PublicacionRequest, ComentarioProducto, ComentarioBlog, StockUpdateRequest } from '../../models/interfaces';
 
 import { environment } from '../../../../environments/environment';
 
@@ -183,5 +183,13 @@ export class HttpService {
 
   crearComentarioBlog(comentario: ComentarioBlog): Observable<ComentarioBlog> {
     return this.http.post<ComentarioBlog>(`${this.baseUrl}/comentarios-blog`, comentario);
+  }
+
+  /**
+   * Actualiza el stock de múltiples productos después de una venta
+   * @param updateData - Datos de actualización del stock
+   */
+  actualizarStockProductos(updateData: StockUpdateRequest): Observable<void> {
+    return this.http.post<void>(`${this.baseUrl}/productos/actualizar-stock`, updateData);
   }
 }

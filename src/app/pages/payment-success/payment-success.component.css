@@ -1,0 +1,67 @@
+:host {
+  display: block;
+  min-height: 100vh;
+  background-color: #f8f9fa;
+}
+
+.card {
+  border-radius: 1rem;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+}
+
+.success-icon {
+  font-size: 4rem;
+  color: #198754;
+}
+
+.order-info {
+  background-color: rgba(25, 135, 84, 0.1);
+  border-radius: 0.5rem;
+  padding: 1.5rem;
+}
+
+.order-number, .order-date {
+  margin-bottom: 0.5rem;
+}
+
+.order-number:last-child, .order-date:last-child {
+  margin-bottom: 0;
+}
+
+.spinner-border {
+  width: 4rem;
+  height: 4rem;
+}
+
+.btn {
+  transition: all 0.3s ease;
+  padding: 0.75rem 1.5rem;
+}
+
+.btn:hover {
+  transform: translateY(-2px);
+}
+
+@media (max-width: 576px) {
+  .success-icon {
+    font-size: 3rem;
+  }
+
+  .card-body {
+    padding: 1.5rem !important;
+  }
+
+  .order-info {
+    padding: 1rem;
+  }
+
+  .btn-lg {
+    padding: 0.5rem 1rem;
+    font-size: 1rem;
+  }
+}
