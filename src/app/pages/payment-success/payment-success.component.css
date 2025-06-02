@@ -11,21 +11,31 @@
 
 .card:hover {
   transform: translateY(-5px);
-  box-shadow: 0 1rem 3rem rgba(0,0,0,.175)!important;
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
 }
 
 .success-icon {
   font-size: 4rem;
-  animation: scaleIn 0.5s ease-out;
+  color: #198754;
 }
 
 .order-info {
   background-color: rgba(25, 135, 84, 0.1);
   border-radius: 0.5rem;
-  padding: 1rem;
-  display: flex;
-  justify-content: center;
-  gap: 2rem;
+  padding: 1.5rem;
+}
+
+.order-number, .order-date {
+  margin-bottom: 0.5rem;
+}
+
+.order-number:last-child, .order-date:last-child {
+  margin-bottom: 0;
+}
+
+.spinner-border {
+  width: 4rem;
+  height: 4rem;
 }
 
 .btn {
@@ -37,13 +47,21 @@
   transform: translateY(-2px);
 }
 
-@keyframes scaleIn {
-  from {
-    transform: scale(0);
-    opacity: 0;
+@media (max-width: 576px) {
+  .success-icon {
+    font-size: 3rem;
   }
-  to {
-    transform: scale(1);
-    opacity: 1;
+
+  .card-body {
+    padding: 1.5rem !important;
+  }
+
+  .order-info {
+    padding: 1rem;
+  }
+
+  .btn-lg {
+    padding: 0.5rem 1rem;
+    font-size: 1rem;
   }
 }

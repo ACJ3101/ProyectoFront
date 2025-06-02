@@ -53,7 +53,7 @@ export class CheckoutComponent implements OnInit {
       },
       error: (error) => {
         console.error('Error al obtener la clave pública:', error);
-        this.toastService.show('Error al inicializar el pago', 'error');
+
       }
     });
   }

@@ -28,11 +28,9 @@ export class StorageService {
   }
 
   private cargarUsuario(): void {
-    if (this.isBrowser()) {
-      const usuarioGuardado = localStorage.getItem(this.USER_KEY);
-      if (usuarioGuardado) {
-        this.usuarioSubject.next(JSON.parse(usuarioGuardado));
-      }
+    const usuarioGuardado = localStorage.getItem(this.USER_KEY);
+    if (usuarioGuardado) {
+      this.usuarioSubject.next(JSON.parse(usuarioGuardado));
     }
   }
 
@@ -165,6 +163,10 @@ export class StorageService {
 
   existeUsuario(): boolean {
     return this.isBrowser() && !!localStorage.getItem(this.USER_KEY);
+  }
+
+  getUsuario(): Usuario | null {
+    return this.usuarioSubject.value;
   }
 
   private isBrowser(): boolean {

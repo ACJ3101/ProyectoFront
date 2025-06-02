@@ -40,8 +40,9 @@ export class PaymentService {
   /**
    * Verifica el estado del pago
    * @param sessionId - ID de la sesión de pago
+   * @returns Observable con el mensaje de estado del pago
    */
-  verifyPaymentStatus(sessionId: string): Observable<any> {
-    return this.http.get(`${this.baseUrl}/pago/verificar/${sessionId}`);
+  verifyPaymentStatus(sessionId: string): Observable<string> {
+    return this.http.get(`${this.baseUrl}/pago/verificar/${sessionId}`, { responseType: 'text' });
   }
 }

@@ -1,0 +1,55 @@
+/* Estilos específicos del componente si son necesarios */
+
+.hover-shadow {
+  transition: all 0.3s ease;
+}
+
+.hover-shadow:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 2rem;
+  background-color: #f8f9fa;
+  border-radius: 1rem;
+}
+
+.empty-state i {
+  display: block;
+  margin-bottom: 1rem;
+}
+
+.badge {
+  padding: 0.5rem 0.75rem;
+  font-weight: 500;
+}
+
+.badge i {
+  font-size: 0.875rem;
+}
+
+.order-details {
+  font-size: 0.9rem;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .container {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  .card {
+    margin-bottom: 1rem;
+  }
+}
+
+/* Animación para el spinner */
+.spinner-border {
+  width: 3rem;
+  height: 3rem;
+}

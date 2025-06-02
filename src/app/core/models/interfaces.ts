@@ -107,4 +107,13 @@ export interface PublicacionRequest {
   autorId: number;
 }
 
+export interface StockUpdate {
+  productoId: number;
+  cantidadVendida: number;
+}
+
+export interface StockUpdateRequest {
+  productos: StockUpdate[];
+}
+
 

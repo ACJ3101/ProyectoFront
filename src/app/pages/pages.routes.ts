@@ -43,6 +43,12 @@ export const PAGES_ROUTES: Routes = [
         canActivate: [profileGuard]
       },
       {
+        path: 'my-orders',
+        loadComponent: () => import('./my-orders/my-orders.component').then(m => m.MyOrdersComponent),
+        canActivate: [profileGuard],
+        title: 'Mis Pedidos'
+      },
+      {
         path: 'admin',
         loadComponent: () => import('./admin/admin.component').then(m => m.AdminComponent),
         canActivate: [adminGuard]
@@ -57,10 +63,8 @@ export const PAGES_ROUTES: Routes = [
       {
         path: 'checkout',
         component: CheckoutComponent,
-
         title: 'Checkout'
       },
-
       {
         path: '**',
         redirectTo: 'home',
