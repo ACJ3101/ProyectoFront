@@ -132,14 +132,9 @@ export class ProfileComponent implements OnInit {
         error: (error) => {
           this.loadingPassword = false;
           this.passwordForm.reset();
-
           // Verificamos si es el error específico de contraseña igual
-          if (error?.error?.message === 'La nueva contraseña no puede ser igual a la actual') {
-            this.toastService.show('La nueva contraseña no puede ser igual a la actual', 'error');
-          } else {
-            this.toastService.show('Error al actualizar la contraseña', 'error');
-          }
-          console.error('Error:', error);
+            this.toastService.show(error.error, 'error');
+
         }
       });
     }

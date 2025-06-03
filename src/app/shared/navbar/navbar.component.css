@@ -1,0 +1,69 @@
+.navbar {
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.navbar-brand {
+  font-weight: 600;
+}
+
+/* Estilos para el dropdown */
+.dropdown-menu {
+  padding: 0.5rem 0;
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.dropdown-item {
+  padding: 0.5rem 1rem;
+  transition: all 0.2s ease;
+}
+
+.dropdown-item:hover {
+  background-color: #f8f9fa;
+}
+
+.dropdown-item.text-danger:hover {
+  background-color: #dc354522;
+}
+
+/* Ajustes para móviles */
+@media (max-width: 991.98px) {
+  .navbar-collapse {
+    padding: 1rem 0;
+  }
+
+  .navbar-nav {
+    gap: 0.5rem;
+  }
+
+  .d-flex.align-items-center.gap-3 {
+    flex-direction: column;
+    align-items: stretch !important;
+    gap: 1rem !important;
+    margin-top: 1rem;
+    width: 100%;
+  }
+
+  .dropdown {
+    width: 100%;
+  }
+
+  .dropdown button {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .dropdown-menu {
+    width: 100%;
+  }
+
+  /* Centrar el nombre de usuario y los botones */
+  .d-flex.align-items-center {
+    justify-content: center;
+  }
+}
+
+/* Animación suave para el menú desplegable */
+.navbar-collapse {
+  transition: all 0.3s ease;
+}
