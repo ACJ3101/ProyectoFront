@@ -1,3 +1,72 @@
+<!-- Modal de confirmación para cambio de rol -->
+<div class="modal fade" id="confirmRolModal" tabindex="-1" aria-labelledby="confirmRolModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="confirmRolModalLabel">
+          <i class="bi bi-exclamation-triangle-fill text-warning me-2"></i>
+          Confirmar cambio de rol
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p class="mb-3">
+          Al cambiar tu rol de Vendedor a Cliente, todos tus productos serán despublicados automáticamente y no serán visibles en la tienda.
+        </p>
+        <p class="mb-0">
+          ¿Estás seguro de que deseas continuar?
+        </p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+        <button type="button" class="btn btn-warning" (click)="confirmarCambioRol()">
+          Sí, cambiar a Cliente
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de confirmación para eliminar cuenta -->
+<div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title text-danger" id="confirmDeleteModalLabel">
+          <i class="bi bi-exclamation-triangle-fill me-2"></i>
+          Eliminar cuenta
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="alert alert-danger">
+          <i class="bi bi-exclamation-circle-fill me-2"></i>
+          <strong>¡Atención!</strong> Esta acción no se puede deshacer.
+        </div>
+        <p class="mb-3">
+          Al eliminar tu cuenta:
+        </p>
+        <ul class="mb-3">
+          <li>Se eliminarán todos tus datos personales</li>
+          <li>Se eliminarán todos tus productos (si eres vendedor)</li>
+          <li>Se eliminarán todas tus publicaciones del blog</li>
+          <li>Perderás acceso inmediato a la plataforma</li>
+        </ul>
+        <p class="mb-0">
+          ¿Estás seguro de que deseas eliminar tu cuenta permanentemente?
+        </p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+        <button type="button" class="btn btn-danger" (click)="confirmarEliminarCuenta()">
+          <i class="bi bi-trash me-2"></i>
+          Sí, eliminar mi cuenta
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div class="container py-5">
   <div class="row justify-content-center">
     <div class="col-md-8">
@@ -65,7 +134,7 @@
 
             <div class="col-md-6 mb-3">
               <label class="form-label">Rol</label>
-              <select class="form-select" formControlName="rolId">
+              <select class="form-select" formControlName="rolId" (change)="onRolChange($event)">
                 <option [value]="ROLES.CLIENTE">Cliente</option>
                 <option [value]="ROLES.VENDEDOR">Vendedor</option>
               </select>
@@ -88,10 +157,10 @@
       </div>
 
       <!-- Cambio de Contraseña -->
-      <div class="card shadow">
+      <div class="card shadow mb-4">
         <div class="card-body">
           <h3 class="card-title mb-4">Cambiar Contraseña</h3>
-          <form [formGroup]="passwordForm" (ngSubmit)="onPasswordSubmit()" class="row">
+          <form [formGroup]="passwordForm" (ngSubmit)="onChangePassword()" class="row">
             <div class="col-12 mb-3">
               <label class="form-label">Nueva Contraseña</label>
               <div class="input-group">
@@ -128,6 +197,25 @@
               </div>
             </div>
           </form>
+        </div>
+      </div>
+
+      <!-- Eliminar Cuenta -->
+      <div class="card shadow border-danger">
+        <div class="card-body">
+          <h3 class="card-title text-danger mb-4">Eliminar Cuenta</h3>
+          <p class="text-muted mb-4">
+            Si eliminas tu cuenta, todos tus datos serán borrados permanentemente. Esta acción no se puede deshacer.
+          </p>
+          <div class="d-grid">
+            <button type="button"
+                    class="btn btn-outline-danger"
+                    [disabled]="usuario?.rol?.nombre === 'ADMIN'"
+                    (click)="mostrarModalEliminar()">
+              <i class="bi bi-trash me-2"></i>
+              Eliminar mi cuenta
+            </button>
+          </div>
         </div>
       </div>
     </div>

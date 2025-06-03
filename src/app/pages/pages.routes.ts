@@ -52,7 +52,8 @@ export const PAGES_ROUTES: Routes = [
         path: 'admin',
         loadComponent: () => import('./admin/admin.component').then(m => m.AdminComponent),
         canActivate: [adminGuard]
-      },{
+      },
+      {
         path: 'payment-success',
         component: PaymentSuccessComponent
       },
@@ -64,6 +65,12 @@ export const PAGES_ROUTES: Routes = [
         path: 'checkout',
         component: CheckoutComponent,
         title: 'Checkout'
+      },
+      {
+        path: 'mis-publicaciones',
+        loadComponent: () => import('./mis-publicaciones/mis-publicaciones.component').then(m => m.MisPublicacionesComponent),
+        canActivate: [profileGuard],
+        title: 'Mis Publicaciones'
       },
       {
         path: '**',

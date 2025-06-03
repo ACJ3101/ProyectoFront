@@ -1,0 +1,27 @@
+.card {
+  transition: transform 0.2s ease-in-out;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+}
+
+.badge {
+  font-size: 0.8rem;
+}
+
+.card-text {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.btn-group .btn {
+  transition: all 0.2s ease-in-out;
+}
+
+.btn-group .btn:hover {
+  transform: scale(1.05);
+}

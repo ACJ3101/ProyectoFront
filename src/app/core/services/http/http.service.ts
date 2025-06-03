@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
-import { Producto, Usuario, Categoria, Comentario, Publicacion, PublicacionRequest, ComentarioProducto, ComentarioBlog, StockUpdateRequest } from '../../models/interfaces';
+import { Producto, Usuario, Categoria, Comentario, Publicacion, PublicacionRequest, ComentarioProducto, ComentarioBlog, StockUpdateRequest, Pedido } from '../../models/interfaces';
 
 import { environment } from '../../../../environments/environment';
 
@@ -148,6 +148,10 @@ export class HttpService {
     return this.http.get<Publicacion[]>(`${this.baseUrl}/publicaciones`);
   }
 
+  getPublicacionesPorUsuario(usuarioId: number): Observable<Publicacion[]> {
+    return this.http.get<Publicacion[]>(`${this.baseUrl}/publicaciones/usuario/${usuarioId}`);
+  }
+
   getPublicacionPorId(id: number): Observable<Publicacion> {
     return this.http.get<Publicacion>(`${this.baseUrl}/publicaciones/${id}`);
   }
@@ -191,5 +195,9 @@ export class HttpService {
    */
   actualizarStockProductos(updateData: StockUpdateRequest): Observable<void> {
     return this.http.post<void>(`${this.baseUrl}/productos/actualizar-stock`, updateData);
+  }
+
+  getPedidos(): Observable<Pedido[]> {
+    return this.http.get<Pedido[]>(`${this.baseUrl}/pedidos`);
   }
 }

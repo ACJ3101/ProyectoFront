@@ -87,6 +87,12 @@
                   <span>Mis Pedidos</span>
                 </a>
               </li>
+              <li *ngIf="usuarioRol !== 'ADMIN'">
+                <a class="dropdown-item d-flex align-items-center gap-2" routerLink="/mis-publicaciones">
+                  <i class="bi bi-journal-text"></i>
+                  <span>Mis Publicaciones</span>
+                </a>
+              </li>
               <li><hr class="dropdown-divider"></li>
               <li>
                 <a class="dropdown-item d-flex align-items-center gap-2" href="#" (click)="logout()">

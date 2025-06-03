@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { HttpService } from '../../core/services/http/http.service';
 import { ToastService } from '../../core/services/toast/toast.service';
-import { Usuario, ROLES, Producto, Categoria } from '../../core/models/interfaces';
+import { Usuario, ROLES, Producto, Categoria, Pedido } from '../../core/models/interfaces';
 
 declare var bootstrap: any;
 
@@ -37,6 +37,13 @@ export class AdminComponent implements OnInit {
   usuarioAEliminar: Usuario | null = null;
   eliminandoUsuario = false;
 
+  pedidos: Pedido[] = [];
+  pedidosFiltrados: Pedido[] = [];
+  loadingPedidos = true;
+  errorPedidos = false;
+  filtroClienteId: number | null = null;
+  pedidoSeleccionado: Pedido | null = null;
+
   constructor(
     private httpService: HttpService,
     private fb: FormBuilder,
@@ -67,6 +74,7 @@ export class AdminComponent implements OnInit {
     this.cargarUsuarios();
     this.cargarProductos();
     this.cargarCategorias();
+    this.cargarPedidos();
   }
 
   cargarUsuarios(): void {
@@ -235,6 +243,9 @@ export class AdminComponent implements OnInit {
 
   cambiarTab(tab: string): void {
     this.activeTab = tab;
+    if (tab === 'pedidos' && this.pedidos.length === 0) {
+      this.cargarPedidos();
+    }
   }
 
   cargarCategorias(): void {
@@ -278,5 +289,43 @@ export class AdminComponent implements OnInit {
         this.eliminandoUsuario = false;
       }
     });
+  }
+
+  cargarPedidos(): void {
+    this.loadingPedidos = true;
+    this.errorPedidos = false;
+
+    this.httpService.getPedidos().subscribe({
+      next: (pedidos: Pedido[]) => {
+        this.pedidos = pedidos;
+        this.aplicarFiltroPedidos();
+        this.loadingPedidos = false;
+      },
+      error: (error: unknown) => {
+        console.error('Error al cargar pedidos:', error);
+        this.errorPedidos = true;
+        this.loadingPedidos = false;
+        this.toastService.show('Error al cargar los pedidos', 'error');
+      }
+    });
+  }
+
+  aplicarFiltroPedidos(): void {
+    this.pedidosFiltrados = this.pedidos.filter(pedido =>
+      !this.filtroClienteId || pedido.clienteId === this.filtroClienteId
+    );
+  }
+
+  limpiarFiltro(): void {
+    this.filtroClienteId = null;
+    this.aplicarFiltroPedidos();
+  }
+
+  verDetallePedido(pedido: Pedido): void {
+    this.pedidoSeleccionado = pedido;
+  }
+
+  cerrarDetallePedido(): void {
+    this.pedidoSeleccionado = null;
   }
 }

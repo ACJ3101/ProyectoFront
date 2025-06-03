@@ -42,18 +42,23 @@ export interface Producto {
 }
 
 export interface Pedido {
-  id?: number;
+  id: number;
   fecha: string;
-  estado: string;
-  usuario: Usuario;
-  detalles: DetallePedido[];
+  estado: 'PENDIENTE' | 'EN_PROCESO' | 'COMPLETADO' | 'CANCELADO';
+  total: number;
+  clienteNick: string;
+  clienteId: number;
+  productoIds: number[];
 }
 
 export interface DetallePedido {
-  id?: number;
-  producto: Producto;
+  id: number;
+  pedidoId: number;
+  productoId: number;
   cantidad: number;
   precioUnitario: number;
+  subtotal: number;
+  productoNombre: string;
 }
 
 export interface ComentarioProducto {
