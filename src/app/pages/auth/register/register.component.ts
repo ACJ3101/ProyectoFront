@@ -19,6 +19,8 @@ export class RegisterComponent implements OnInit {
   registroForm!: FormGroup;
   submitted = false;
   usuarioExistente = false;
+  mostrarPassword = false;
+  mostrarRepetirPassword = false;
 
 
   constructor(
@@ -119,5 +121,13 @@ export class RegisterComponent implements OnInit {
 
 
     }
+  }
+
+  toggleMostrarPassword() {
+    this.mostrarPassword = !this.mostrarPassword;
+  }
+
+  toggleMostrarRepetirPassword() {
+    this.mostrarRepetirPassword = !this.mostrarRepetirPassword;
   }
 }

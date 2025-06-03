@@ -1,0 +1,21 @@
+.footer {
+  border-top: 1px solid rgba(0,0,0,0.1);
+  font-size: 0.9rem;
+}
+
+.contact-list li {
+  transition: transform 0.2s ease;
+}
+
+.contact-list li:hover {
+  transform: translateY(-2px);
+}
+
+/* Ajustes para móviles */
+@media (max-width: 767.98px) {
+  .contact-list {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+}

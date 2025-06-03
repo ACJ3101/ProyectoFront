@@ -87,8 +87,13 @@
                 <!-- Contraseña -->
                 <div class="form-outline mb-2">
                   <label class="form-label">Contraseña *</label>
-                  <input type="password" formControlName="contraseña" class="form-control"
-                         [ngClass]="{'is-invalid': submitted && registroForm.controls['contraseña'].invalid}" />
+                  <div class="input-group">
+                    <input [type]="mostrarPassword ? 'text' : 'password'" formControlName="contraseña" class="form-control"
+                           [ngClass]="{'is-invalid': submitted && registroForm.controls['contraseña'].invalid}" />
+                    <button class="btn btn-outline-secondary" type="button" (click)="toggleMostrarPassword()">
+                      <i class="bi" [ngClass]="mostrarPassword ? 'bi-eye-slash' : 'bi-eye'"></i>
+                    </button>
+                  </div>
                   <div *ngIf="submitted && registroForm.controls['contraseña'].errors" class="text-danger small">
                     <div *ngIf="registroForm.controls['contraseña'].errors['required']">La contraseña es obligatoria</div>
                     <div *ngIf="registroForm.controls['contraseña'].errors['minlength']">La contraseña debe tener al menos 6 caracteres</div>
@@ -98,8 +103,13 @@
                 <!-- Repetir Contraseña -->
                 <div class="form-outline mb-2">
                   <label class="form-label">Repetir contraseña *</label>
-                  <input type="password" formControlName="repetirContraseña" class="form-control"
-                         [ngClass]="{'is-invalid': submitted && registroForm.controls['repetirContraseña'].invalid}" />
+                  <div class="input-group">
+                    <input [type]="mostrarRepetirPassword ? 'text' : 'password'" formControlName="repetirContraseña" class="form-control"
+                           [ngClass]="{'is-invalid': submitted && registroForm.controls['repetirContraseña'].invalid}" />
+                    <button class="btn btn-outline-secondary" type="button" (click)="toggleMostrarRepetirPassword()">
+                      <i class="bi" [ngClass]="mostrarRepetirPassword ? 'bi-eye-slash' : 'bi-eye'"></i>
+                    </button>
+                  </div>
                   <div *ngIf="submitted && registroForm.controls['repetirContraseña'].errors" class="text-danger small">
                     <div *ngIf="registroForm.controls['repetirContraseña'].errors['required']">Debes repetir la contraseña</div>
                     <div *ngIf="registroForm.controls['repetirContraseña'].errors['mismatch']">Las contraseñas no coinciden</div>

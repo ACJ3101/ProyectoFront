@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { HttpService } from '../../../core/services/http/http.service';
 import { StorageService } from '../../../core/services/storageService/storage.service';
+import { ToastService } from '../../../core/services/toast/toast.service';
 import { Producto, Categoria } from '../../../core/models/interfaces';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 
@@ -27,6 +28,7 @@ export class MyProductsComponent implements OnInit {
   constructor(
     private httpService: HttpService,
     private storageService: StorageService,
+    private toastService: ToastService,
     private fb: FormBuilder
   ) {
     this.productoForm = this.fb.group({
@@ -122,18 +124,23 @@ export class MyProductsComponent implements OnInit {
 
       this.httpService.actualizarProducto(this.productoSeleccionado.id!, productoActualizado).subscribe({
         next: () => {
+          this.toastService.show('Producto actualizado correctamente', 'success');
           this.cerrarModal();
           this.cargarProductos();
         },
         error: (error) => {
           if (error.status === 200) {
+            this.toastService.show('Producto actualizado correctamente', 'success');
             this.cerrarModal();
             this.cargarProductos();
           } else {
-          console.error('Error al actualizar el producto:', error);
+            this.toastService.show('Error al actualizar el producto', 'error');
+            console.error('Error al actualizar el producto:', error);
           }
         }
       });
+    } else {
+      this.toastService.show('Por favor, completa todos los campos correctamente', 'warning');
     }
   }
 
@@ -181,12 +188,13 @@ export class MyProductsComponent implements OnInit {
     if (this.productoAEliminar) {
       this.httpService.eliminarProducto(this.productoAEliminar.id!).subscribe({
         next: () => {
+          this.toastService.show('Producto eliminado correctamente', 'success');
           this.cerrarModalEliminacion();
           this.cargarProductos();
         },
         error: (error) => {
+          this.toastService.show('Error al eliminar el producto', 'error');
           console.error('Error al eliminar el producto:', error);
-          alert('Error al eliminar el producto');
         }
       });
     }
@@ -207,7 +215,7 @@ export class MyProductsComponent implements OnInit {
     if (this.productoCreacionForm.valid) {
       const usuario = this.storageService.obtenerUsuario();
       if (!usuario) {
-        console.error('No hay usuario autenticado');
+        this.toastService.show('No hay usuario autenticado', 'error');
         return;
       }
 
@@ -218,14 +226,17 @@ export class MyProductsComponent implements OnInit {
 
       this.httpService.crearProducto(nuevoProducto).subscribe({
         next: () => {
+          this.toastService.show('Producto creado correctamente', 'success');
           this.cerrarModalCreacion();
           this.cargarProductos();
         },
         error: (error) => {
+          this.toastService.show('Error al crear el producto', 'error');
           console.error('Error al crear el producto:', error);
-          alert('Error al crear el producto');
         }
       });
+    } else {
+      this.toastService.show('Por favor, completa todos los campos correctamente', 'warning');
     }
   }
 
