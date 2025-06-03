@@ -1,3 +1,32 @@
+<!-- Modal de confirmación para cambio de rol -->
+<div class="modal fade" id="confirmRolModal" tabindex="-1" aria-labelledby="confirmRolModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="confirmRolModalLabel">
+          <i class="bi bi-exclamation-triangle-fill text-warning me-2"></i>
+          Confirmar cambio de rol
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p class="mb-3">
+          Al cambiar tu rol de Vendedor a Cliente, todos tus productos serán despublicados automáticamente y no serán visibles en la tienda.
+        </p>
+        <p class="mb-0">
+          ¿Estás seguro de que deseas continuar?
+        </p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+        <button type="button" class="btn btn-warning" (click)="confirmarCambioRol()">
+          Sí, cambiar a Cliente
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div class="container py-5">
   <div class="row justify-content-center">
     <div class="col-md-8">
@@ -65,7 +94,7 @@
 
             <div class="col-md-6 mb-3">
               <label class="form-label">Rol</label>
-              <select class="form-select" formControlName="rolId">
+              <select class="form-select" formControlName="rolId" (change)="onRolChange($event)">
                 <option [value]="ROLES.CLIENTE">Cliente</option>
                 <option [value]="ROLES.VENDEDOR">Vendedor</option>
               </select>
@@ -91,7 +120,7 @@
       <div class="card shadow">
         <div class="card-body">
           <h3 class="card-title mb-4">Cambiar Contraseña</h3>
-          <form [formGroup]="passwordForm" (ngSubmit)="onPasswordSubmit()" class="row">
+          <form [formGroup]="passwordForm" (ngSubmit)="onChangePassword()" class="row">
             <div class="col-12 mb-3">
               <label class="form-label">Nueva Contraseña</label>
               <div class="input-group">
