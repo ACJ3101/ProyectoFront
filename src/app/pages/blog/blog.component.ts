@@ -75,6 +75,36 @@ export class BlogComponent implements OnInit {
     return this.usuarioActual?.id === publicacion.autor.id;
   }
 
+  puedeEliminar(publicacion: Publicacion): boolean {
+    if (!this.usuarioActual) return false;
+
+    // El usuario puede eliminar si es el autor o si es admin
+    return this.usuarioActual.id === publicacion.autor.id ||
+           this.usuarioActual.rol?.nombre === 'ADMIN';
+  }
+
+  eliminarPublicacion(publicacion: Publicacion, event: Event): void {
+    event.stopPropagation(); // Evita que se abra el modal de comentarios
+
+    if (!this.puedeEliminar(publicacion)) {
+      this.toastService.show('No tienes permisos para eliminar esta publicación', 'error');
+      return;
+    }
+
+    if (confirm(`¿Estás seguro de que deseas eliminar la publicación "${publicacion.titulo}"?`)) {
+      this.http.eliminarPublicacion(publicacion.id!).subscribe({
+        next: () => {
+          this.toastService.show('Publicación eliminada con éxito', 'success');
+          this.cargarPublicaciones();
+        },
+        error: (error) => {
+          console.error('Error al eliminar la publicación:', error);
+          this.toastService.show('Error al eliminar la publicación', 'error');
+        }
+      });
+    }
+  }
+
   prepararNuevaPublicacion(): void {
     if (this.usuarioActual) {
       this.nuevaPublicacion = {

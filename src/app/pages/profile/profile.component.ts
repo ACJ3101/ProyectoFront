@@ -4,7 +4,7 @@ import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } 
 import { StorageService } from '../../core/services/storageService/storage.service';
 import { HttpService } from '../../core/services/http/http.service';
 import { ToastService } from '../../core/services/toast/toast.service';
-import { ROLES, Rol } from '../../core/models/interfaces';
+import { ROLES, Rol, Usuario } from '../../core/models/interfaces';
 
 @Component({
   selector: 'app-profile',
@@ -14,7 +14,7 @@ import { ROLES, Rol } from '../../core/models/interfaces';
   styleUrls: ['./profile.component.css']
 })
 export class ProfileComponent implements OnInit {
-  usuario: any = null;
+  usuario: Usuario | null = null;
   profileForm: FormGroup;
   passwordForm: FormGroup;
   loading = false;
@@ -43,19 +43,17 @@ export class ProfileComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.storageService.usuario$.subscribe(usuario => {
-      if (usuario) {
-        this.usuario = usuario;
-        this.profileForm.patchValue({
-          nombre: usuario.nombre || '',
-          apellidos: usuario.apellidos || '',
-          nick: usuario.nick || '',
-          email: usuario.email || '',
-          direccion: usuario.direccion || '',
-          rolId: usuario.rol?.id || ROLES.CLIENTE
-        });
-      }
-    });
+    this.usuario = this.storageService.obtenerUsuario();
+    if (this.usuario) {
+      this.profileForm.patchValue({
+        nombre: this.usuario.nombre,
+        apellidos: this.usuario.apellidos,
+        nick: this.usuario.nick,
+        email: this.usuario.email,
+        direccion: this.usuario.direccion,
+        rolId: this.usuario.rol?.id || ROLES.CLIENTE
+      });
+    }
   }
 
   getRoleBadgeClass(): string {
@@ -79,19 +77,35 @@ export class ProfileComponent implements OnInit {
       };
 
       this.httpService.actualizarUsuario(datosActualizados).subscribe({
-        next: (response) => {
+        next: (response: Usuario) => {
           this.loading = false;
           this.toastService.show('Perfil actualizado correctamente', 'success');
 
-          // Actualizar el usuario en el storage con el nuevo rol
-          const rolNombre = datosActualizados.rolId === ROLES.VENDEDOR ? 'VENDEDOR' : 'CLIENTE';
-          this.storageService.guardarUsuario({
-            ...this.usuario,
-            ...datosActualizados,
-            rol: {
-              id: datosActualizados.rolId,
-              nombre: rolNombre
-            }
+          // Usamos directamente la respuesta del servidor para actualizar el usuario
+          const usuarioActualizado: Usuario = {
+            id: response.id,
+            nombre: response.nombre,
+            apellidos: response.apellidos,
+            nick: response.nick,
+            email: response.email,
+            direccion: response.direccion,
+            rol: response.rol
+          };
+
+          // Actualizamos el usuario local
+          this.usuario = usuarioActualizado;
+
+          // Actualizamos el storage con los datos del servidor
+          this.storageService.guardarUsuario(usuarioActualizado);
+
+          // Actualizamos el formulario con los valores del servidor
+          this.profileForm.patchValue({
+            nombre: response.nombre,
+            apellidos: response.apellidos,
+            nick: response.nick,
+            email: response.email,
+            direccion: response.direccion,
+            rolId: response.rol.id
           });
         },
         error: (error) => {
@@ -103,40 +117,22 @@ export class ProfileComponent implements OnInit {
     }
   }
 
-  onPasswordSubmit(): void {
-    if (this.passwordForm.valid && this.usuario) {
+  onChangePassword(): void {
+    if (this.passwordForm.valid && this.usuario?.id) {
       this.loadingPassword = true;
-      const { nuevaContrasena } = this.passwordForm.value;
-
-      this.httpService.cambiarContrasena(this.usuario.id, nuevaContrasena).subscribe({
-        next: () => {
-          // Después de cambiar la contraseña, hacemos login con las nuevas credenciales
-          this.httpService.login(this.usuario.email, nuevaContrasena).subscribe({
-            next: (loginResponse) => {
-              this.loadingPassword = false;
-              // Guardamos los nuevos tokens
-              this.storageService.guardarToken(loginResponse.token);
-              this.storageService.guardarRefreshToken(loginResponse.refreshToken);
-
-              this.toastService.show('Contraseña actualizada correctamente', 'success');
-              this.passwordForm.reset();
-            },
-            error: (loginError) => {
-              this.loadingPassword = false;
-              this.passwordForm.reset();
-              this.toastService.show('Error al actualizar las credenciales', 'error');
-              console.error('Error en login:', loginError);
-            }
-          });
-        },
-        error: (error) => {
-          this.loadingPassword = false;
-          this.passwordForm.reset();
-          // Verificamos si es el error específico de contraseña igual
-            this.toastService.show(error.error, 'error');
-
-        }
-      });
+      this.httpService.cambiarContrasena(this.usuario.id, this.passwordForm.value.nuevaContrasena)
+        .subscribe({
+          next: () => {
+            this.loadingPassword = false;
+            this.passwordForm.reset();
+            this.toastService.show('Contraseña actualizada correctamente', 'success');
+          },
+          error: (error) => {
+            this.loadingPassword = false;
+            this.toastService.show('Error al actualizar la contraseña', 'error');
+            console.error('Error:', error);
+          }
+        });
     }
   }
 }
