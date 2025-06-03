@@ -6,6 +6,7 @@ import { HttpService } from '../../core/services/http/http.service';
 import { ToastService } from '../../core/services/toast/toast.service';
 import { ROLES, Rol, Usuario, Producto } from '../../core/models/interfaces';
 import { forkJoin } from 'rxjs';
+import { Router } from '@angular/router';
 
 declare var bootstrap: any;
 
@@ -25,12 +26,15 @@ export class ProfileComponent implements OnInit {
   showPassword = false;
   ROLES = ROLES;
   private confirmModal: any;
+  private deleteModal: any;
+  loadingDelete = false;
 
   constructor(
     private fb: FormBuilder,
     private storageService: StorageService,
     private httpService: HttpService,
-    private toastService: ToastService
+    private toastService: ToastService,
+    private router: Router
   ) {
     this.profileForm = this.fb.group({
       nombre: ['', Validators.required],
@@ -59,10 +63,14 @@ export class ProfileComponent implements OnInit {
       });
     }
 
-    // Inicializar el modal
-    const modalEl = document.getElementById('confirmRolModal');
-    if (modalEl) {
-      this.confirmModal = new bootstrap.Modal(modalEl);
+    // Inicializar los modales
+    const modalRolEl = document.getElementById('confirmRolModal');
+    const modalDeleteEl = document.getElementById('confirmDeleteModal');
+    if (modalRolEl) {
+      this.confirmModal = new bootstrap.Modal(modalRolEl);
+    }
+    if (modalDeleteEl) {
+      this.deleteModal = new bootstrap.Modal(modalDeleteEl);
     }
   }
 
@@ -75,6 +83,64 @@ export class ProfileComponent implements OnInit {
 
   togglePasswordVisibility(): void {
     this.showPassword = !this.showPassword;
+  }
+
+  mostrarModalEliminar(): void {
+    this.deleteModal.show();
+  }
+
+  confirmarEliminarCuenta(): void {
+    if (!this.usuario?.id || this.loadingDelete) return;
+
+    this.loadingDelete = true;
+
+    // Si es vendedor, primero eliminamos sus productos
+    if (this.usuario.rol?.nombre === 'VENDEDOR') {
+      this.httpService.getProductosPorUsuario(this.usuario.id).subscribe({
+        next: (productos) => {
+          const eliminaciones = productos.map(producto =>
+            this.httpService.eliminarProducto(producto.id!)
+          );
+
+          // Ejecutar todas las eliminaciones de productos
+          forkJoin(eliminaciones).subscribe({
+            next: () => this.procederConEliminacionCuenta(),
+            error: (error) => {
+              console.error('Error al eliminar productos:', error);
+              this.loadingDelete = false;
+              this.toastService.show('Error al eliminar los productos', 'error');
+            }
+          });
+        },
+        error: (error) => {
+          console.error('Error al obtener productos:', error);
+          this.loadingDelete = false;
+          this.toastService.show('Error al obtener los productos', 'error');
+        }
+      });
+    } else {
+      // Si no es vendedor, procedemos directamente con la eliminación de la cuenta
+      this.procederConEliminacionCuenta();
+    }
+  }
+
+  private procederConEliminacionCuenta(): void {
+    if (!this.usuario?.id) return;
+
+    this.httpService.eliminarUsuario(this.usuario.id).subscribe({
+      next: () => {
+        this.loadingDelete = false;
+        this.deleteModal.hide();
+        this.toastService.show('Cuenta eliminada correctamente', 'success');
+        this.storageService.eliminarUsuario();
+        this.router.navigate(['/auth/login']);
+      },
+      error: (error) => {
+        this.loadingDelete = false;
+        console.error('Error al eliminar la cuenta:', error);
+        this.toastService.show('Error al eliminar la cuenta', 'error');
+      }
+    });
   }
 
   onRolChange(event: any): void {
