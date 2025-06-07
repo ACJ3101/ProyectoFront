@@ -24,6 +24,53 @@
     </div>
   </div>
 
+  <!-- Barra de filtros por categoría -->
+  <div class="bg-light rounded shadow-sm p-3 mb-4">
+    <div class="d-flex align-items-center flex-wrap gap-2">
+      <span class="text-muted me-2">
+        <i class="bi bi-filter me-1"></i>Filtrar por:
+      </span>
+      <div class="btn-group">
+        <button class="btn"
+                [class.btn-primary]="categoriaSeleccionada === 'Todos'"
+                [class.btn-outline-primary]="categoriaSeleccionada !== 'Todos'"
+                (click)="filtrarPorCategoria('Todos')">
+          Todos
+        </button>
+        <button class="btn"
+                [class.btn-primary]="categoriaSeleccionada === 'General'"
+                [class.btn-outline-primary]="categoriaSeleccionada !== 'General'"
+                (click)="filtrarPorCategoria('General')">
+          General
+        </button>
+        <button class="btn"
+                [class.btn-primary]="categoriaSeleccionada === 'Tutoriales'"
+                [class.btn-outline-primary]="categoriaSeleccionada !== 'Tutoriales'"
+                (click)="filtrarPorCategoria('Tutoriales')">
+          Tutoriales
+        </button>
+        <button class="btn"
+                [class.btn-primary]="categoriaSeleccionada === 'Patrones'"
+                [class.btn-outline-primary]="categoriaSeleccionada !== 'Patrones'"
+                (click)="filtrarPorCategoria('Patrones')">
+          Patrones
+        </button>
+        <button class="btn"
+                [class.btn-primary]="categoriaSeleccionada === 'Consejos'"
+                [class.btn-outline-primary]="categoriaSeleccionada !== 'Consejos'"
+                (click)="filtrarPorCategoria('Consejos')">
+          Consejos
+        </button>
+        <button class="btn"
+                [class.btn-primary]="categoriaSeleccionada === 'Experiencias'"
+                [class.btn-outline-primary]="categoriaSeleccionada !== 'Experiencias'"
+                (click)="filtrarPorCategoria('Experiencias')">
+          Experiencias
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- Estado de carga -->
   <div *ngIf="cargando" class="text-center py-5">
     <div class="spinner-border text-primary" role="status">
