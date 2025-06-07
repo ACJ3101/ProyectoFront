@@ -20,10 +20,12 @@ declare var bootstrap: any;
 })
 export class BlogComponent implements OnInit {
   publicaciones: Publicacion[] = [];
+  publicacionesSinFiltrar: Publicacion[] = [];
   usuarioActual: Usuario | null = null;
   cargando: boolean = true;
   error: string | null = null;
   publicacionSeleccionada: Publicacion | null = null;
+  categoriaSeleccionada: string = 'Todos';
 
   nuevaPublicacion: PublicacionRequest = {
     titulo: '',
@@ -49,6 +51,7 @@ export class BlogComponent implements OnInit {
 
     this.http.getPublicaciones().subscribe({
       next: (publicaciones) => {
+        this.publicacionesSinFiltrar = publicaciones;
         this.publicaciones = publicaciones;
         this.cargando = false;
       },
@@ -59,6 +62,18 @@ export class BlogComponent implements OnInit {
         this.toastService.show('Error al cargar las publicaciones', 'error');
       }
     });
+  }
+
+  filtrarPorCategoria(categoria: string): void {
+    this.categoriaSeleccionada = categoria;
+
+    if (categoria === 'Todos') {
+      this.publicaciones = this.publicacionesSinFiltrar;
+    } else {
+      this.publicaciones = this.publicacionesSinFiltrar.filter(
+        pub => pub.categoria === categoria
+      );
+    }
   }
 
   formatearFecha(fecha: string): string {
