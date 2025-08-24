@@ -1,13 +1,12 @@
 {
-    "version": 2,
-    "routes": [
+    "rewrites": [
       {
-        "src": "/api/(.*)",
-        "dest": "https://TU-BACKEND-DOMINIO/api/$1"
+        "source": "/api/(.*)",
+        "destination": "https://TU-BACKEND.koyeb.app/api/$1"
       },
       {
-        "src": "/(.*)",
-        "dest": "/index.html"
+        "source": "/(.*)",
+        "destination": "/index.html"
       }
     ]
   }
